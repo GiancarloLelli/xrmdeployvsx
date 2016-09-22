@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Avanade.XRM.Deployer</RootNamespace>
     <AssemblyName>Avanade.XRM.Deployer</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -246,10 +247,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auth\AuthHelper.cs" />
+    <Compile Include="Common\Bootstrapper.cs" />
     <Compile Include="Common\ConfigurationProvider.cs" />
+    <Compile Include="Common\TimedRunner.cs" />
+    <Compile Include="CRM\WebResourceContainer.cs" />
     <Compile Include="Extensions\EntityExtension.cs" />
     <Compile Include="Extensions\ListExtension.cs" />
     <Compile Include="Model\CrmWebResource.cs" />
+    <Compile Include="Model\DeployConfiguration.cs" />
     <Compile Include="Model\SolutionData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

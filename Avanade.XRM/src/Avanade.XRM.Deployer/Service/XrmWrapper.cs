@@ -13,11 +13,11 @@ namespace Avanade.XRM.Deployer.Service
 {
 	public class XrmWrapper
 	{
-		readonly IOrganizationService m_service;
+		readonly Lazy<IOrganizationService> m_service;
 
 		public XrmWrapper(string connectionString)
 		{
-			m_service = new OrganizationService(connectionString);
+			m_service = new Lazy<IOrganizationService>(() => new OrganizationService(connectionString));
 		}
 
 		public SolutionData GetSolutionByName(string name)
@@ -30,7 +30,7 @@ namespace Avanade.XRM.Deployer.Service
 			};
 
 			query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, name);
-			Entity result = m_service.RetrieveMultiple(query).Entities.FirstOrDefault();
+			Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
 
 			if (result != null)
 			{
@@ -49,7 +49,7 @@ namespace Avanade.XRM.Deployer.Service
 			OrganizationRequest requestPublish = null;
 			OrganizationRequest requestAddToSolution = null;
 
-			switch (changeType)
+			switch (changeType.ToLower())
 			{
 				case "add":
 					requestGeneral = new CreateRequest { Target = webResource };
@@ -107,7 +107,7 @@ namespace Avanade.XRM.Deployer.Service
 				};
 
 				req.Requests.AddRange(batch);
-				var res = (ExecuteMultipleResponse)m_service.Execute(req);
+				var res = (ExecuteMultipleResponse)m_service.Value.Execute(req);
 
 				if (res.IsFaulted)
 				{
@@ -140,7 +140,7 @@ namespace Avanade.XRM.Deployer.Service
 				LogicalName = logicalName
 			};
 
-			var resp = (RetrieveEntityResponse)m_service.Execute(request);
+			var resp = (RetrieveEntityResponse)m_service.Value.Execute(request);
 			return resp.EntityMetadata;
 		}
 
@@ -158,7 +158,7 @@ namespace Avanade.XRM.Deployer.Service
 			filter.AddCondition("displayname", ConditionOperator.Equal, name);
 			filter.AddCondition("name", ConditionOperator.Equal, name);
 
-			Entity result = m_service.RetrieveMultiple(query).Entities.FirstOrDefault();
+			Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
 
 			if (result != null)
 			{
