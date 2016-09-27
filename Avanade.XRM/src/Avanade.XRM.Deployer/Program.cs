@@ -14,14 +14,18 @@ namespace Avanade.XRM.Deployer
 {
 	class Program
 	{
-		static void Main(string[] args) => TimedRunner.RunAndTime(() => TimedMain(args), 3000);
+		static void Main(string[] args)
+		{
+			if (args.Length == 0) throw new ArgumentException("Indice di configurazione obbligatorio");
+			TimedRunner.RunAndTime(() => TimedMain(args), 3000);
+		}
 
 		static void TimedMain(string[] args)
 		{
 			try
 			{
 				WebResourceContainer container;
-				var bootstrap = Bootstrapper.Init();
+				var bootstrap = Bootstrapper.Init(int.Parse(args[0]));
 				var context = new XrmWrapper(bootstrap.CRMKey);
 				var userName = !string.IsNullOrEmpty(bootstrap.User) ? bootstrap.User : Environment.UserName;
 				var workspaceName = !string.IsNullOrEmpty(bootstrap.Workspace) ? bootstrap.Workspace : Environment.MachineName;
