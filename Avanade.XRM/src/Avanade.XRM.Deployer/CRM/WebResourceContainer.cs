@@ -1,6 +1,8 @@
 ﻿using Avanade.XRM.Deployer.Model;
 using Microsoft.TeamFoundation.VersionControl.Client;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Avanade.XRM.Deployer.CRM
@@ -37,6 +39,13 @@ namespace Avanade.XRM.Deployer.CRM
 
 				if (crmWebResource.FileType == 99) continue;
 				resources.Add(crmWebResource);
+			}
+
+			if (!Directory.Exists("Build Logs")) Directory.CreateDirectory("Build Logs");
+			foreach (var change in resources)
+			{
+				var timestamp = $"{DateTime.Now.Day}{DateTime.Now.Month}{DateTime.Now.Year}{DateTime.Now.Second}";
+				File.WriteAllText($"Build Logs\\Build-Content-{timestamp}.txt", $"{change.ChangeType}\t{change.File}");
 			}
 
 			return resources;

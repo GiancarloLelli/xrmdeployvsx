@@ -1,5 +1,6 @@
 ﻿using Avanade.XRM.Deployer.Model;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Client;
 using Microsoft.Xrm.Client.Services;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
@@ -17,7 +18,9 @@ namespace Avanade.XRM.Deployer.Service
 
 		public XrmWrapper(string connectionString)
 		{
-			m_service = new Lazy<IOrganizationService>(() => new OrganizationService(connectionString));
+			var connection = new CrmConnection(connectionString);
+			connection.Timeout = TimeSpan.FromMinutes(10);
+			m_service = new Lazy<IOrganizationService>(() => new OrganizationService(connection));
 		}
 
 		public SolutionData GetSolutionByName(string name)
