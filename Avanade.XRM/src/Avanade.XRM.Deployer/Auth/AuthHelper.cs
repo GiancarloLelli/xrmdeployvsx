@@ -10,7 +10,7 @@ namespace Avanade.XRM.Deployer.Auth
 		{
 			var credentials = new TfsClientCredentials(true);
 
-			if (!con.UseWindowsCredentials)
+			if (con.UseConfigCredentials)
 			{
 				credentials = new TfsClientCredentials(new WindowsCredential(new NetworkCredential(con.User, con.Password, con.Domain)));
 			}

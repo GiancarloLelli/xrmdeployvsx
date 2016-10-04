@@ -13,7 +13,7 @@ namespace Avanade.XRM.Deployer.Model
 		public string CRMKey { get; set; }
 		public string Workspace { get; set; }
 
-		public bool UseWindowsCredentials
+		public bool UseConfigCredentials
 		{
 			get
 			{
