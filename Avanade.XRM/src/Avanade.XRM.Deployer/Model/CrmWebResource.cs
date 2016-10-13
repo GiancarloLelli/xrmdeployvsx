@@ -1,13 +1,22 @@
-﻿using System;
+﻿using Microsoft.Xrm.Sdk;
+using System;
 using System.IO;
 
 namespace Avanade.XRM.Deployer.Model
 {
 	public class CrmWebResource
 	{
+		private string m_fullName;
+
+		public CrmWebResource(string prefix)
+		{
+			Prefix = prefix;
+		}
+
 		public string File { get; set; }
 		public string ChangeType { get; set; }
 		public string DisplayName { get; set; }
+		public string Prefix { get; set; }
 
 		public string FileStream
 		{
@@ -23,6 +32,39 @@ namespace Avanade.XRM.Deployer.Model
 			{
 				return GetFileType();
 			}
+		}
+
+		public bool Deleting
+		{
+			get
+			{
+				return ChangeType.ToLower().Equals("delete");
+			}
+		}
+
+		public string FullName
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(m_fullName))
+				{
+					m_fullName = GetFullName();
+				}
+
+				return m_fullName;
+			}
+			set
+			{
+				m_fullName = value;
+			}
+		}
+
+		private string GetFullName()
+		{
+			var name = string.Empty;
+			var index = File.IndexOf(Prefix);
+			if (index != -1) name = File.Substring(index).Replace("\\", "/");
+			return name;
 		}
 
 		private string GetEncodedFileStream()
@@ -77,6 +119,23 @@ namespace Avanade.XRM.Deployer.Model
 			}
 
 			return type;
+		}
+
+		public Entity ToEntity()
+		{
+			Entity webResource = null;
+
+			if (!Deleting)
+			{
+				webResource = new Entity("webresource");
+				webResource["content"] = FileStream;
+				webResource["displayname"] = FullName;
+				webResource["description"] = FullName;
+				webResource["name"] = FullName;
+				webResource["webresourcetype"] = new OptionSetValue(FileType);
+			}
+
+			return webResource;
 		}
 	}
 }

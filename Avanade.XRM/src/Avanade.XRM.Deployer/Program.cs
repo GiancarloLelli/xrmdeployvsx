@@ -1,14 +1,9 @@
-﻿using Avanade.XRM.Deployer.Common;
-using Avanade.XRM.Deployer.Extensions;
-using Avanade.XRM.Deployer.Model;
+﻿using Avanade.XRM.Deployer.Auth;
+using Avanade.XRM.Deployer.Common;
+using Avanade.XRM.Deployer.CRM;
 using Avanade.XRM.Deployer.Service;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.VersionControl.Client;
-using Microsoft.Xrm.Sdk;
+using Avanade.XRM.Deployer.TFS;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 
 namespace Avanade.XRM.Deployer
 {
@@ -16,87 +11,39 @@ namespace Avanade.XRM.Deployer
 	{
 		static void Main(string[] args)
 		{
-			var uri = new Uri(ConfigurationProvider.GetConnectionString("TFS"), UriKind.Absolute);
-			var user = ConfigurationProvider.GetAppSettingsValue("User");
-			var pwd = ConfigurationProvider.GetAppSettingsValue("Password");
-			var domain = ConfigurationProvider.GetAppSettingsValue("Domain");
+			if (args.Length == 0) throw new ArgumentException("Indice di configurazione obbligatorio");
+			TimedRunner.RunAndTime(() => TimedMain(args), 3000);
+		}
 
-			var credentials = new TfsClientCredentials(new WindowsCredential(new NetworkCredential(user, pwd, domain)));
-			List<CrmWebResource> resources = new List<CrmWebResource>();
-
-			using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(uri, credentials))
+		static void TimedMain(string[] args)
+		{
+			try
 			{
-				Console.WriteLine($"[LOG] => Enumerazione cambiamenti sul Workspace.");
-				VersionControlServer versionControl = collection.GetService(typeof(VersionControlServer)) as VersionControlServer;
-				Workspace workspace = versionControl.GetWorkspace(Environment.MachineName, Environment.UserName);
-				PendingChange[] changes = workspace.GetPendingChanges();
-				Console.WriteLine($"[LOG] => Trovate {changes.Count()} Check-Out items.");
+				WebResourceContainer container;
+				var bootstrap = Bootstrapper.Init(int.Parse(args[0]));
+				var context = new XrmWrapper(bootstrap.CRMKey);
+				var userName = !string.IsNullOrEmpty(bootstrap.User) ? bootstrap.User : Environment.UserName;
+				var workspaceName = !string.IsNullOrEmpty(bootstrap.Workspace) ? bootstrap.Workspace : Environment.MachineName;
+				var sourceControl = new SourceControlManager(workspaceName, userName);
+				var sourceControlResult = sourceControl.InitializeWorkspace(bootstrap.TFS, AuthHelper.GetCredentials(bootstrap));
 
-				foreach (var change in changes)
-				{
-					var crmWebResource = new CrmWebResource
-					{
-						ChangeType = change.ChangeTypeName,
-						File = change.LocalItem,
-						DisplayName = change.FileName
-					};
+				// Must resolve conflicts
+				if (!sourceControlResult.Continue) return;
 
-					if (crmWebResource.FileType != 99)
-						resources.Add(crmWebResource);
-				}
+				container = new WebResourceContainer(sourceControlResult.Changes, bootstrap.Prefix, context);
+				Console.WriteLine($"[LOG] => Trovate {container.WebResources.Count} Web Resource.");
+				Console.WriteLine($"[STS] => Add: {container.AddedItems} - Edit: {container.EditedItems} - Delete: {container.DeletedItems}");
+				Console.WriteLine($"[LOG] => '{bootstrap.Prefix}' utilizzato come root.");
+				Console.WriteLine($"[LOG] => Fetch soluzione '{bootstrap.Solution}' da CRM.");
+				container.EnsureContinue(bootstrap.Solution);
 
-				workspace.CheckIn(changes, $"CI Checkin by {user}");
-				Console.WriteLine($"[LOG] => Check-In effettuato on behalf of {user}.");
+				Console.WriteLine($"[LOG] => Generazione pool OrganizationRequest & scrittura su CRM.");
+				context.Flush(container.BuildRequestList(bootstrap.Solution));
 			}
-
-			var add = resources.Count(p => p.ChangeType.ToLower().Equals("add"));
-			var edit = resources.Count(p => p.ChangeType.ToLower().Equals("edit"));
-			var delete = resources.Count(p => p.ChangeType.ToLower().Equals("delete"));
-
-			Console.WriteLine($"\n[LOG] => Trovate {resources.Count} Web Resource.");
-			Console.WriteLine($"[STS] => Add: {add} - Edit: {edit} - Delete: {delete}\n");
-
-			var context = new XrmWrapper("CRM");
-			var prefix = ConfigurationProvider.GetAppSettingsValue("Prefix");
-			Console.WriteLine($"[LOG] => '{prefix}' utilizzato come root.");
-
-			var solutionName = ConfigurationProvider.GetAppSettingsValue("SolutionName");
-			Console.WriteLine($"[LOG] => Fetch soluzione '{solutionName}' da CRM.");
-			var solution = context.GetSolutionByName(solutionName);
-			if (solution.Id == Guid.Empty) return; // No solution. Exit.
-
-			Console.WriteLine($"\n[LOG] => Generazione pool OrganizationRequest.");
-			List<OrganizationRequest> requests = new List<OrganizationRequest>();
-			foreach (var resource in resources)
+			catch (Exception exception)
 			{
-				var index = resource.File.IndexOf(prefix);
-				if (index == -1) continue; // File not valid for this prefix
-
-				var resourceFullName = resource.File.Substring(index).Replace("\\", "/");
-				var deleting = resource.ChangeType.ToLower().Equals("delete");
-				Entity webRes = null;
-
-				if (!deleting)
-				{
-					webRes = new Entity("webresource");
-					webRes["content"] = resource.FileStream;
-					webRes["displayname"] = resourceFullName;
-					webRes["description"] = resourceFullName;
-					webRes["name"] = resourceFullName;
-					webRes["webresourcetype"] = new OptionSetValue(resource.FileType);
-				}
-
-				var factory = context.RequestFactory(resource.ChangeType.ToLower(), resourceFullName, webRes, solutionName);
-				OrganizationRequest request = factory.Item1;
-				OrganizationRequest publishRequest = factory.Item2;
-
-				request.SetIfNotNull("SolutionUniqueName", solutionName);
-				requests.AddIfNotNull(request);
-				requests.AddIfNotNull(publishRequest);
+				Console.WriteLine($"[EXCEPTION] => {exception.Message}");
 			}
-
-			Console.WriteLine($"[LOG] => Scrittura su CRM.");
-			context.Flush(requests);
 		}
 	}
 }

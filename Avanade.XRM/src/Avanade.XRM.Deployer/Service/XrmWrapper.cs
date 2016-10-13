@@ -1,5 +1,6 @@
 ﻿using Avanade.XRM.Deployer.Model;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Client;
 using Microsoft.Xrm.Client.Services;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
@@ -13,11 +14,13 @@ namespace Avanade.XRM.Deployer.Service
 {
 	public class XrmWrapper
 	{
-		readonly IOrganizationService m_service;
+		readonly Lazy<IOrganizationService> m_service;
 
 		public XrmWrapper(string connectionString)
 		{
-			m_service = new OrganizationService(connectionString);
+			var connection = new CrmConnection(connectionString);
+			connection.Timeout = TimeSpan.FromMinutes(10);
+			m_service = new Lazy<IOrganizationService>(() => new OrganizationService(connection));
 		}
 
 		public SolutionData GetSolutionByName(string name)
@@ -30,7 +33,7 @@ namespace Avanade.XRM.Deployer.Service
 			};
 
 			query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, name);
-			Entity result = m_service.RetrieveMultiple(query).Entities.FirstOrDefault();
+			Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
 
 			if (result != null)
 			{
@@ -49,7 +52,7 @@ namespace Avanade.XRM.Deployer.Service
 			OrganizationRequest requestPublish = null;
 			OrganizationRequest requestAddToSolution = null;
 
-			switch (changeType)
+			switch (changeType.ToLower())
 			{
 				case "add":
 					requestGeneral = new CreateRequest { Target = webResource };
@@ -107,7 +110,7 @@ namespace Avanade.XRM.Deployer.Service
 				};
 
 				req.Requests.AddRange(batch);
-				var res = (ExecuteMultipleResponse)m_service.Execute(req);
+				var res = (ExecuteMultipleResponse)m_service.Value.Execute(req);
 
 				if (res.IsFaulted)
 				{
@@ -140,7 +143,7 @@ namespace Avanade.XRM.Deployer.Service
 				LogicalName = logicalName
 			};
 
-			var resp = (RetrieveEntityResponse)m_service.Execute(request);
+			var resp = (RetrieveEntityResponse)m_service.Value.Execute(request);
 			return resp.EntityMetadata;
 		}
 
@@ -158,7 +161,7 @@ namespace Avanade.XRM.Deployer.Service
 			filter.AddCondition("displayname", ConditionOperator.Equal, name);
 			filter.AddCondition("name", ConditionOperator.Equal, name);
 
-			Entity result = m_service.RetrieveMultiple(query).Entities.FirstOrDefault();
+			Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
 
 			if (result != null)
 			{
