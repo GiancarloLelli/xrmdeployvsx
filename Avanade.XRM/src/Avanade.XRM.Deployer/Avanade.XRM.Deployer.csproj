@@ -40,6 +40,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowedReferenceRelatedFileExtensions>.none</AllowedReferenceRelatedFileExtensions>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -271,6 +273,7 @@
     <Compile Include="Common\Bootstrapper.cs" />
     <Compile Include="Common\ConfigurationProvider.cs" />
     <Compile Include="Common\TimedRunner.cs" />
+    <Compile Include="Common\VisualStudioLogger.cs" />
     <Compile Include="CRM\WebResourceContainer.cs" />
     <Compile Include="Extensions\EntityExtension.cs" />
     <Compile Include="Extensions\ListExtension.cs" />
@@ -307,11 +310,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Microsoft.TeamFoundationServer.ExtendedClient.14.102.0\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.TeamFoundationServer.ExtendedClient.14.102.0\build\Microsoft.TeamFoundationServer.ExtendedClient.targets'))" />
   </Target>
-  <!--To modify your build process, add your task inside one of the targets below and uncomment it. 
-	   Other similar extension points exist, see Microsoft.Common.targets.-->
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-    <Exec Condition="'$(Configuration)' == 'Release'" Command="Powershell.exe -ExecutionPolicy Unrestricted -File $(SolutionDir)cleanup\Cleanup.ps1" IgnoreExitCode="true" WorkingDirectory="$(OutDir)" />
+    <Exec Command="Powershell.exe -ExecutionPolicy Unrestricted -File $(SolutionDir)cleanup\Cleanup.ps1" IgnoreExitCode="true" WorkingDirectory="$(OutDir)" />
   </Target>
 </Project>
