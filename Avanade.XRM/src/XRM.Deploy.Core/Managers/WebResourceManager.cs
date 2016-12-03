@@ -1,41 +1,41 @@
-﻿using Avanade.XRM.Deployer.Extensions;
-using Avanade.XRM.Deployer.Model;
-using Avanade.XRM.Deployer.Service;
+﻿using Avanade.XRM.Deployer.Service;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using XRM.Deploy.Core.Extensions;
+using XRM.Deploy.Core.Models;
 
-namespace Avanade.XRM.Deployer.CRM
+namespace XRM.Deploy.Core.Managers
 {
-	public class WebResourceContainer
+	internal class WebResourceManager
 	{
 		readonly PendingChange[] m_changes;
-		readonly XrmWrapper m_context;
+		readonly XrmService m_context;
 
-		public int TotalChanges { get { return m_changes.Count(); } }
-		public int AddedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("add")); } }
-		public int DeletedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("delete")); } }
-		public int EditedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("edit")); } }
+		internal int TotalChanges { get { return m_changes.Count(); } }
+		internal int AddedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("add")); } }
+		internal int DeletedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("delete")); } }
+		internal int EditedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("edit")); } }
 
-		public List<CrmWebResource> WebResources { get; private set; }
+		internal List<WebResourceModel> WebResources { get; private set; }
 
-		public WebResourceContainer(PendingChange[] changes, string prefix, XrmWrapper wrapper)
+		internal WebResourceManager(PendingChange[] changes, string prefix, XrmService wrapper)
 		{
 			m_changes = changes;
 			m_context = wrapper;
 			WebResources = GetWebResourceFromChanges(prefix);
 		}
 
-		private List<CrmWebResource> GetWebResourceFromChanges(string prefix)
+		private List<WebResourceModel> GetWebResourceFromChanges(string prefix)
 		{
-			List<CrmWebResource> resources = new List<CrmWebResource>();
+			List<WebResourceModel> resources = new List<WebResourceModel>();
 
 			foreach (var change in m_changes)
 			{
-				var crmWebResource = new CrmWebResource(prefix)
+				var crmWebResource = new WebResourceModel(prefix)
 				{
 					ChangeType = change.ChangeTypeName,
 					File = change.LocalItem,
@@ -46,17 +46,10 @@ namespace Avanade.XRM.Deployer.CRM
 				resources.Add(crmWebResource);
 			}
 
-			if (!Directory.Exists("Build Logs")) Directory.CreateDirectory("Build Logs");
-			foreach (var change in resources)
-			{
-				var timestamp = $"{DateTime.Now.Day}{DateTime.Now.Month}{DateTime.Now.Year}{DateTime.Now.Second}";
-				File.WriteAllText($"Build Logs\\Build-Content-{timestamp}.txt", $"{change.ChangeType}\t{change.File}");
-			}
-
 			return resources;
 		}
 
-		public void EnsureContinue(string solution)
+		internal void EnsureContinue(string solution)
 		{
 			if (AddedItems > 0)
 			{
@@ -68,7 +61,7 @@ namespace Avanade.XRM.Deployer.CRM
 			};
 		}
 
-		public List<OrganizationRequest> BuildRequestList(string solution)
+		internal List<OrganizationRequest> BuildRequestList(string solution)
 		{
 			List<OrganizationRequest> requests = new List<OrganizationRequest>();
 

@@ -2,23 +2,23 @@
 using System;
 using System.IO;
 
-namespace Avanade.XRM.Deployer.Model
+namespace XRM.Deploy.Core.Models
 {
-	public class CrmWebResource
+	internal class WebResourceModel
 	{
 		private string m_fullName;
 
-		public CrmWebResource(string prefix)
+		internal WebResourceModel(string prefix)
 		{
 			Prefix = prefix;
 		}
 
-		public string File { get; set; }
-		public string ChangeType { get; set; }
-		public string DisplayName { get; set; }
-		public string Prefix { get; set; }
+		internal string File { get; set; }
+		internal string ChangeType { get; set; }
+		internal string DisplayName { get; set; }
+		internal string Prefix { get; set; }
 
-		public string FileStream
+		internal string FileStream
 		{
 			get
 			{
@@ -26,7 +26,7 @@ namespace Avanade.XRM.Deployer.Model
 			}
 		}
 
-		public int FileType
+		internal int FileType
 		{
 			get
 			{
@@ -34,7 +34,7 @@ namespace Avanade.XRM.Deployer.Model
 			}
 		}
 
-		public bool Deleting
+		internal bool Deleting
 		{
 			get
 			{
@@ -42,7 +42,7 @@ namespace Avanade.XRM.Deployer.Model
 			}
 		}
 
-		public string FullName
+		internal string FullName
 		{
 			get
 			{
@@ -121,7 +121,7 @@ namespace Avanade.XRM.Deployer.Model
 			return type;
 		}
 
-		public Entity ToEntity()
+		internal Entity ToEntity()
 		{
 			Entity webResource = null;
 

@@ -1,5 +1,4 @@
-﻿using Avanade.XRM.Deployer.Model;
-using Microsoft.Crm.Sdk.Messages;
+﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Client;
 using Microsoft.Xrm.Client.Services;
 using Microsoft.Xrm.Sdk;
@@ -8,45 +7,40 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using XRM.Deploy.Core.Factories;
+using XRM.Deploy.Core.Models;
 
 namespace Avanade.XRM.Deployer.Service
 {
-	public class XrmWrapper
+	internal class XrmService
 	{
 		readonly Lazy<IOrganizationService> m_service;
+		readonly Action<string> m_progress;
 
-		public XrmWrapper(string connectionString)
+		internal XrmService(string connectionString, Action<string> report)
 		{
-			var connection = new CrmConnection(connectionString);
+			m_progress = report;
+            var settings = new ConnectionStringSettings { ConnectionString = connectionString, Name = "Key-CRM" };
+			var connection = new CrmConnection(settings);
 			connection.Timeout = TimeSpan.FromMinutes(10);
 			m_service = new Lazy<IOrganizationService>(() => new OrganizationService(connection));
 		}
 
-		public SolutionData GetSolutionByName(string name)
+		internal SolutionDetailModel GetSolutionByName(string name)
 		{
-			SolutionData solution = null;
+			SolutionDetailModel solution = null;
 
-			QueryExpression query = new QueryExpression
-			{
-				EntityName = "solution"
-			};
-
+			QueryExpression query = new QueryExpression("solution");
 			query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, name);
 			Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
-
-			if (result != null)
-			{
-				solution = new SolutionData
-				{
-					Id = result.Id
-				};
-			}
+			if (result != null) solution = new SolutionDetailModel(result.Id);
 
 			return solution;
 		}
 
-		public Tuple<OrganizationRequest, OrganizationRequest, OrganizationRequest> RequestFactory(string changeType, string resourceName, Entity webResource, string solution)
+		internal Tuple<OrganizationRequest, OrganizationRequest, OrganizationRequest> RequestFactory(string changeType, string resourceName, Entity webResource, string solution)
 		{
 			OrganizationRequest requestGeneral = null;
 			OrganizationRequest requestPublish = null;
@@ -55,16 +49,9 @@ namespace Avanade.XRM.Deployer.Service
 			switch (changeType.ToLower())
 			{
 				case "add":
-					requestGeneral = new CreateRequest { Target = webResource };
 					var meta = GetMetadata("webresource");
-
-					requestAddToSolution = new AddSolutionComponentRequest()
-					{
-						AddRequiredComponents = false,
-						ComponentType = 61, // See: https://msdynamicscrmblog.wordpress.com/2013/08/06/rootcomponent-types-in-the-solution-xml-file-in-dynamics-crm-2011/
-						ComponentId = meta.MetadataId.Value,
-						SolutionUniqueName = solution
-					};
+					requestGeneral = OrganizationRequestFactory.CreateFactory(webResource);
+					requestAddToSolution = OrganizationRequestFactory.AddSolutionFactory(false, 61, meta.MetadataId.Value, solution);
 					break;
 				case "edit":
 				case "delete":
@@ -73,16 +60,13 @@ namespace Avanade.XRM.Deployer.Service
 					{
 						if (changeType.Equals("delete"))
 						{
-							requestGeneral = new DeleteRequest { Target = new EntityReference("webresource", resourceId) };
+							requestGeneral = OrganizationRequestFactory.DeleteFactory(new EntityReference("webresource", resourceId));
 						}
 						else
 						{
 							webResource.Id = resourceId;
-							requestGeneral = new UpdateRequest { Target = webResource };
-							requestPublish = new PublishXmlRequest
-							{
-								ParameterXml = string.Concat("<importexportxml><webresources><webresource>{", resourceId.ToString(), "}</webresource></webresources></importexportxml>")
-							};
+							requestGeneral = OrganizationRequestFactory.UpdateFactory(webResource);
+							requestPublish = OrganizationRequestFactory.PublishFactory(resourceId.ToString());
 						}
 					}
 					break;
@@ -91,7 +75,7 @@ namespace Avanade.XRM.Deployer.Service
 			return new Tuple<OrganizationRequest, OrganizationRequest, OrganizationRequest>(requestGeneral, requestPublish, requestAddToSolution);
 		}
 
-		public void Flush(IEnumerable<OrganizationRequest> reqs)
+		internal void Flush(IEnumerable<OrganizationRequest> reqs)
 		{
 			var chunk = 0;
 			while (reqs.Skip(chunk).Any())
@@ -101,35 +85,24 @@ namespace Avanade.XRM.Deployer.Service
 
 				ExecuteMultipleRequest req = new ExecuteMultipleRequest()
 				{
+					Requests = new OrganizationRequestCollection(),
 					Settings = new ExecuteMultipleSettings()
 					{
 						ReturnResponses = true,
 						ContinueOnError = true
-					},
-					Requests = new OrganizationRequestCollection()
+					}
 				};
 
 				req.Requests.AddRange(batch);
-				var res = (ExecuteMultipleResponse)m_service.Value.Execute(req);
+				var res = m_service.Value.Execute(req) as ExecuteMultipleResponse;
 
 				if (res.IsFaulted)
 				{
 					foreach (var results in res.Responses.Where(r => r.Fault != null))
 					{
 						var index = results.RequestIndex;
-
-						var createOperation = batch[index] as CreateRequest;
-						var updateOperation = batch[index] as UpdateRequest;
-						var stateOperation = batch[index] as DeleteRequest;
-						var publishOperation = batch[index] as PublishXmlRequest;
-
-						var entity = createOperation != null ? createOperation.Target
-								: (updateOperation != null ? updateOperation.Target : null);
-
-						var name = entity != null ? entity.GetAttributeValue<string>("displayname") : "Not available";
-
 						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine($"[ERROR] => Index: {index} - WebResource: {name} - Error: {results.Fault.Message}");
+						Console.WriteLine($"[ERROR] => Index: {index} - Error: {results.Fault.Message}");
 						Console.ForegroundColor = ConsoleColor.White;
 					}
 				}
@@ -151,25 +124,17 @@ namespace Avanade.XRM.Deployer.Service
 		{
 			Guid id = Guid.Empty;
 
-			QueryExpression query = new QueryExpression
-			{
-				EntityName = "webresource",
-				TopCount = 1
-			};
+			QueryExpression query = new QueryExpression("webresource");
+			query.TopCount = 1;
 
 			var filter = query.Criteria.AddFilter(LogicalOperator.Or);
 			filter.AddCondition("displayname", ConditionOperator.Equal, name);
 			filter.AddCondition("name", ConditionOperator.Equal, name);
 
 			Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
-
-			if (result != null)
-			{
-				id = result.Id;
-			}
+			id = result != null ? result.Id : Guid.Empty;
 
 			return id;
 		}
-
 	}
 }
