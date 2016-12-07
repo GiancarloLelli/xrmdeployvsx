@@ -1,9 +1,12 @@
 ﻿using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
-using Xrm.Deploy.Core.Models;
+using Xrm.Deploy.Vsix.Helpers;
 using XRM.Deploy.Core;
+using XRM.Deploy.Vsix.Models;
+using XRM.Deploy.Vsix.Services;
+using XRM.Deploy.Vsix.ViewModels;
+using XRM.Deploy.Vsix.Views;
 
 namespace XRM.Deploy.Vsix.Commands.DeployCommand
 {
@@ -11,6 +14,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
     {
         private Guid m_pane;
         private readonly Package m_package;
+        private readonly DteService m_service;
         public const int CommandId = 0x0100;
         public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
 
@@ -25,6 +29,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             if (package == null) throw new ArgumentNullException("Package");
             m_package = package;
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
+            m_service = new DteService();
 
             OleMenuCommandService commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
@@ -37,36 +42,25 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            // Check if config file exist, if not show window and create one.
-            LogProgress(null, "Hello, World!");
-            return;
+            var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
 
+            if (string.IsNullOrEmpty(publishSettigsPath))
+            {
+                var dialog = new NewPublishSettingsPage();
+                dialog.ShowDialog();
+                publishSettigsPath = (dialog.DataContext as NewPublishSettingsPageViewModel)?.FilePath;
+            }
+
+            // No valid configuration found or provided
+            if (string.IsNullOrEmpty(publishSettigsPath)) return;
+
+            var deployConfiguration = XmlObjectsHelper.Deserialize<DeployConfigurationModelFacade>(publishSettigsPath);
             var orchestrator = new PublishOrchestrator();
             orchestrator.ReportProgress += LogProgress;
-            orchestrator.Publish(new DeployConfigurationModel());
+            orchestrator.Publish(deployConfiguration.InnerObject);
             orchestrator.ReportProgress -= LogProgress;
         }
 
-        private void LogProgress(object sender, string e)
-        {
-            IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-            if (outWindow != null)
-            {
-                IVsOutputWindowPane customPane = null;
-                outWindow.GetPane(ref m_pane, out customPane);
-
-                if (customPane == null)
-                {
-                    outWindow.CreatePane(ref m_pane, "Avanade CRM Toolkit - Publish Output", 1, 1);
-                    outWindow.GetPane(ref m_pane, out customPane);
-                }
-
-                if (customPane != null)
-                {
-                    customPane?.OutputString(string.Concat(e, Environment.NewLine));
-                    customPane?.Activate();
-                }
-            }
-        }
+        private void LogProgress(object sender, string e) => m_service.LogMessage(e, m_pane);
     }
 }

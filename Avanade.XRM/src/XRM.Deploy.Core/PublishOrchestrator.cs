@@ -16,11 +16,11 @@ namespace XRM.Deploy.Core
             {
                 WebResourceManager container;
                 Action<string> reportAction = (m) => { ReportProgress?.Invoke(this, m); };
-                var context = new XrmService(deployConfiguration.CRMKey, reportAction);
+                var context = new XrmService(deployConfiguration.CRMConnectionString, reportAction);
                 var userName = !string.IsNullOrEmpty(deployConfiguration.User) ? deployConfiguration.User : Environment.UserName;
                 var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
                 var sourceControl = new SourceControlManager(workspaceName, userName, reportAction);
-                var sourceControlResult = sourceControl.InitializeWorkspace(deployConfiguration.TFS, CredentialsProvider.GetCredentials(deployConfiguration));
+                var sourceControlResult = sourceControl.InitializeWorkspace(deployConfiguration.TFSCollectionUrl, CredentialsProvider.GetCredentials(deployConfiguration), deployConfiguration.CheckInEnabled);
 
                 // Must resolve conflicts
                 if (!sourceControlResult.Continue) return;
