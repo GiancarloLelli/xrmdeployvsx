@@ -33,7 +33,7 @@ namespace XRM.Deploy.Core.Managers
                 m_progress?.Invoke($"[LOG] => Trovate {result.Changes.Length} Check-Out items.");
 
                 var folderFilters = result.Changes.Select(c => c.LocalOrServerFolder).Distinct().ToArray();
-                if (folderFilters.Length > 0)
+                if (folderFilters.Length > 0 && checkin)
                 {
                     var conflicts = workspace.QueryConflicts(folderFilters, true);
                     if (conflicts.Length > 0)
@@ -51,11 +51,6 @@ namespace XRM.Deploy.Core.Managers
 
                 return result;
             }
-        }
-
-        internal object InitializeWorkspace(Uri tFSCollectionUrl, TfsClientCredentials tfsClientCredentials, object checkInEnabled)
-        {
-            throw new NotImplementedException();
         }
     }
 }

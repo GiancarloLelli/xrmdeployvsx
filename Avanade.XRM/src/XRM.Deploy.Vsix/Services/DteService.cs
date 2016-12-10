@@ -46,8 +46,8 @@ namespace XRM.Deploy.Vsix.Services
 
                 if (customPane != null)
                 {
-                    customPane?.OutputString(string.Concat(e, Environment.NewLine));
-                    customPane?.Activate();
+                    customPane.OutputString(string.Concat(e, Environment.NewLine));
+                    customPane.Activate();
                 }
             }
         }

@@ -5,7 +5,7 @@ using Xrm.Deploy.Core.Models;
 
 namespace XRM.Deploy.Core.Providers
 {
-    [Obsolete("This class is obsolete. It has been replace by a per-project configuration.", true)]
+    [Obsolete("This class is obsolete. It has been replaced by a per-project configuration.", true)]
     internal class PublishSettingsProvider
     {
         internal static DeployConfigurationModel Init(int index)

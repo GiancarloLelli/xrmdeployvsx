@@ -20,7 +20,9 @@ namespace XRM.Deploy.Core
                 var userName = !string.IsNullOrEmpty(deployConfiguration.User) ? deployConfiguration.User : Environment.UserName;
                 var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
                 var sourceControl = new SourceControlManager(workspaceName, userName, reportAction);
-                var sourceControlResult = sourceControl.InitializeWorkspace(new Uri(deployConfiguration.TFSCollectionUrl, UriKind.Absolute), CredentialsProvider.GetCredentials(deployConfiguration), deployConfiguration.CheckInEnabled);
+                var tfsCollectionUri = new Uri(deployConfiguration.TFSCollectionUrl, UriKind.Absolute);
+                var tfsClientCredentials = CredentialsProvider.GetCredentials(deployConfiguration);
+                var sourceControlResult = sourceControl.InitializeWorkspace(tfsCollectionUri, tfsClientCredentials, deployConfiguration.CheckInEnabled);
 
                 // Must resolve conflicts
                 if (!sourceControlResult.Continue) return;
