@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Xrm.Deploy.Core.Models
+﻿namespace Xrm.Deploy.Core.Models
 {
     public class DeployConfigurationModel
     {
-        public Uri TFSCollectionUrl { get; set; }
+        public string TFSCollectionUrl { get; set; }
         public string Domain { get; set; }
         public string User { get; set; }
         public string Password { get; set; }

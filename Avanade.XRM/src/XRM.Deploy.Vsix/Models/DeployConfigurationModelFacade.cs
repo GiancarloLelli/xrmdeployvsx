@@ -6,8 +6,10 @@ using Xrm.Deploy.Core.Models;
 
 namespace XRM.Deploy.Vsix.Models
 {
+    [Serializable]
     public class DeployConfigurationModelFacade : ObservableObject
     {
+        [XmlIgnore]
         private DeployConfigurationModel m_model;
 
         [XmlIgnore]
@@ -25,7 +27,7 @@ namespace XRM.Deploy.Vsix.Models
         }
 
         [Required, DataType(DataType.Url)]
-        public Uri TfsProjectCollectionUri
+        public string TfsProjectCollectionUri
         {
             get { return m_model.TFSCollectionUrl; }
             set

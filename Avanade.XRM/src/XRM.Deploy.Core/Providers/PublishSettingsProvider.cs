@@ -17,7 +17,7 @@ namespace XRM.Deploy.Core.Providers
                                         .Elements("Configuration")
                                         .Select(c => new DeployConfigurationModel
                                         {
-                                            TFSCollectionUrl = new Uri(c.Element("TFS").Value, UriKind.Absolute),
+                                            TFSCollectionUrl = c.Element("TFS").Value,
                                             CRMConnectionString = c.Element("CRMKey").Value,
                                             Domain = c.Element("Domain").Value,
                                             Solution = c.Element("Solution").Value,

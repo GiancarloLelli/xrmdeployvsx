@@ -20,30 +20,38 @@ namespace XRM.Deploy.Vsix.ViewModels
 
         private readonly DteService m_service;
 
-        internal NewPublishSettingsPageViewModel()
+        internal NewPublishSettingsPageViewModel(DteService service)
         {
             SaveConfigurationCommand = new RelayCommand(() => Save());
             Configuration = new DeployConfigurationModelFacade();
-            m_service = new DteService();
+            m_service = service;
         }
 
         private void Save()
         {
-            List<ValidationResult> results = new List<ValidationResult>();
-            var validation = Validator.TryValidateObject(Configuration, new ValidationContext(Configuration), results);
+            var panelGuid = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
 
-            if (!validation)
+            try
             {
-                results.ForEach((error) => m_service.LogMessage($"[ERR] => {error.ErrorMessage}", new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6")));
-                return;
+                List<ValidationResult> results = new List<ValidationResult>();
+                var validation = Validator.TryValidateObject(Configuration, new ValidationContext(Configuration), results);
+
+                if (!validation)
+                {
+                    results.ForEach((error) => m_service.LogMessage($"[ERR] => {error.ErrorMessage}", panelGuid));
+                    return;
+                }
+
+                var xmlDump = XmlObjectsHelper.Serialize(Configuration);
+                var fullPath = $"{m_service.PropertiesDirectory}\\AvanadeToolkit.publishSettings";
+                File.WriteAllText(fullPath, xmlDump);
+                FilePath = fullPath;
             }
-
-            var propertiesProjectpath = m_service.GetProprtiesFolderPath();
-            var xmlDump = XmlObjectsHelper.Serialize(Configuration);
-
-            var fullPath = $"{propertiesProjectpath}AvanadeToolkit.publishSettings";
-            File.WriteAllText(fullPath, xmlDump);
-            FilePath = fullPath;
+            catch (Exception ex)
+            {
+                m_service.LogMessage($"[EXCEPTION] => {ex.Message}", panelGuid);
+                // TODO: Telemetry
+            }
         }
     }
 }

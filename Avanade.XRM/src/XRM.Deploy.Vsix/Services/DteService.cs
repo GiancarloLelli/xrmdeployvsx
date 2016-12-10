@@ -1,17 +1,33 @@
-﻿using EnvDTE80;
+﻿using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.IO;
+using System.Linq;
 
 namespace XRM.Deploy.Vsix.Services
 {
-    internal class DteService
+    public class DteService
     {
+        readonly DTE2 m_environment;
+
+        internal string PropertiesDirectory { get; private set; }
+
+        internal DteService()
+        {
+            m_environment = Package.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+        }
+
         internal string GetPublishSettingsFilePathIfExist()
         {
-            var vsEnvironment = Package.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
-            // Check for AvanadeToolkit.publishSettings inside Properties folder of selected project
-            return string.Empty;
+            var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
+            var selectedProject = selectedProjectBase as Project;
+            var fullPath = selectedProject?.FileName;
+            var projectName = $"{selectedProject?.Name}.csproj";
+            PropertiesDirectory = fullPath?.Replace(projectName, "Properties");
+            var publishFilePath = string.Concat(PropertiesDirectory, "\\AvanadeToolkit.publishSettings");
+            return File.Exists(publishFilePath) ? publishFilePath : string.Empty;
         }
 
         internal void LogMessage(string e, Guid pane)
@@ -34,11 +50,6 @@ namespace XRM.Deploy.Vsix.Services
                     customPane?.Activate();
                 }
             }
-        }
-
-        internal string GetProprtiesFolderPath()
-        {
-            return string.Empty;
         }
     }
 }

@@ -96,8 +96,8 @@
                                 <ColumnDefinition Width="140" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Enable auto checkin" VerticalAlignment="Center" />
-                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Checked="{Binding Configuration.CheckInEnabled, Mode=TwoWay}" />
+                            <TextBlock Grid.Column="0" Text="Abilita auto checkin" VerticalAlignment="Center" />
+                            <CheckBox Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding Configuration.CheckInEnabled, Mode=TwoWay}" />
                         </Grid>
                     </StackPanel>
                 </GroupBox.Content>

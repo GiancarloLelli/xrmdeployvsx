@@ -42,23 +42,30 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
-
-            if (string.IsNullOrEmpty(publishSettigsPath))
+            try
             {
-                var dialog = new NewPublishSettingsPage();
-                dialog.ShowDialog();
-                publishSettigsPath = (dialog.DataContext as NewPublishSettingsPageViewModel)?.FilePath;
+                var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
+                if (string.IsNullOrEmpty(publishSettigsPath))
+                {
+                    var dialog = new NewPublishSettingsPage(m_service);
+                    dialog.ShowDialog();
+                    publishSettigsPath = (dialog.DataContext as NewPublishSettingsPageViewModel)?.FilePath;
+                }
+
+                // No valid configuration found or provided
+                if (string.IsNullOrEmpty(publishSettigsPath)) return;
+
+                var deployConfiguration = XmlObjectsHelper.Deserialize<DeployConfigurationModelFacade>(publishSettigsPath);
+                var orchestrator = new PublishOrchestrator();
+                orchestrator.ReportProgress += LogProgress;
+                orchestrator.Publish(deployConfiguration.InnerObject);
+                orchestrator.ReportProgress -= LogProgress;
             }
-
-            // No valid configuration found or provided
-            if (string.IsNullOrEmpty(publishSettigsPath)) return;
-
-            var deployConfiguration = XmlObjectsHelper.Deserialize<DeployConfigurationModelFacade>(publishSettigsPath);
-            var orchestrator = new PublishOrchestrator();
-            orchestrator.ReportProgress += LogProgress;
-            orchestrator.Publish(deployConfiguration.InnerObject);
-            orchestrator.ReportProgress -= LogProgress;
+            catch (Exception ex)
+            {
+                m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
+                // TODO: Telemetry
+            }
         }
 
         private void LogProgress(object sender, string e) => m_service.LogMessage(e, m_pane);
