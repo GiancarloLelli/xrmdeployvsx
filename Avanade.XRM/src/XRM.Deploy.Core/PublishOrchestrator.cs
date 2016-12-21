@@ -38,10 +38,11 @@ namespace XRM.Deploy.Core
 
                 ReportProgress?.Invoke(this, $"[LOG] => Generazione pool OrganizationRequest & scrittura su CRM.");
                 context.Flush(container.BuildRequestList(deployConfiguration.Solution));
+                ReportProgress?.Invoke(this, $"[LOG] => Scrittura su CRM completata.\n");
             }
             catch (Exception exception)
             {
-                ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}");
+                ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}\n");
                 if (!(exception is DeployException))
                     TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(exception);
             }

@@ -34,6 +34,7 @@ namespace XRM.Deploy.Vsix.Services
             var fullPath = selectedProject?.FileName;
             var projectName = $"{selectedProject?.Name}.csproj";
             PropertiesDirectory = fullPath?.Replace(projectName, "Properties");
+            if (!Directory.Exists(PropertiesDirectory)) Directory.CreateDirectory(PropertiesDirectory);
             var publishFilePath = string.Concat(PropertiesDirectory, "\\AvanadeToolkit.publishSettings");
             return File.Exists(publishFilePath) ? publishFilePath : string.Empty;
         }

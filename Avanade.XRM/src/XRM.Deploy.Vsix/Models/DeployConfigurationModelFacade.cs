@@ -59,7 +59,7 @@ namespace XRM.Deploy.Vsix.Models
             }
         }
 
-        [Required, RegularExpression("^[a-zA-z]{3}_$")]
+        [Required, RegularExpression("^[a-zA-z]_$")]
         public string Prefix
         {
             get { return m_model.Prefix; }
