@@ -1,6 +1,7 @@
 ﻿using Avanade.XRM.Deployer.Service;
 using System;
 using Xrm.Deploy.Core.Models;
+using XRM.Deploy.Core.Fallback;
 using XRM.Deploy.Core.Managers;
 using XRM.Deploy.Core.Providers;
 using XRM.Telemetry;
@@ -41,7 +42,8 @@ namespace XRM.Deploy.Core
             catch (Exception exception)
             {
                 ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}");
-                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(exception);
+                if (!(exception is DeployException))
+                    TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(exception);
             }
         }
     }

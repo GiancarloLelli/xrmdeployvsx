@@ -254,6 +254,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\OrganizationRequestFactory.cs" />
+    <Compile Include="Fallback\DeployException.cs" />
     <Compile Include="Providers\CredentialsProvider.cs" />
     <Compile Include="Extensions\EntityExtension.cs" />
     <Compile Include="Extensions\ListExtension.cs" />
