@@ -3,6 +3,7 @@ using System;
 using Xrm.Deploy.Core.Models;
 using XRM.Deploy.Core.Managers;
 using XRM.Deploy.Core.Providers;
+using XRM.Telemetry;
 
 namespace XRM.Deploy.Core
 {
@@ -40,6 +41,7 @@ namespace XRM.Deploy.Core
             catch (Exception exception)
             {
                 ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}");
+                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(exception);
             }
         }
     }

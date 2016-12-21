@@ -7,6 +7,7 @@ using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
 using XRM.Deploy.Vsix.Views;
+using XRM.Telemetry;
 
 namespace XRM.Deploy.Vsix.Commands.DeployCommand
 {
@@ -64,7 +65,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
-                // TODO: Telemetry
+                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
             }
         }
 

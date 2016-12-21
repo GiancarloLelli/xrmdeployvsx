@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Deploy.Core", "src\XRM.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Deploy.Vsix", "src\XRM.Deploy.Vsix\XRM.Deploy.Vsix.csproj", "{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Telemetry", "src\XRM.Telemetry\XRM.Telemetry.csproj", "{92F998CC-F3B0-428D-9891-4124109D4AD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

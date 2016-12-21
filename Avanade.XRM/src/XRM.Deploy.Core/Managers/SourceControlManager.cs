@@ -3,6 +3,7 @@ using Microsoft.TeamFoundation.VersionControl.Client;
 using System;
 using System.Linq;
 using XRM.Deploy.Core.Models;
+using XRM.Telemetry;
 
 namespace XRM.Deploy.Core.Managers
 {
@@ -22,35 +23,42 @@ namespace XRM.Deploy.Core.Managers
         internal SourceControlResultModel InitializeWorkspace(Uri tfs, TfsClientCredentials auth, bool checkin)
         {
             SourceControlResultModel result = new SourceControlResultModel();
-
-            using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(tfs, auth))
+            try
             {
-                m_progress?.Invoke($"[LOG] => Enumerazione cambiamenti sul Workspace.");
-                VersionControlServer versionControl = collection.GetService(typeof(VersionControlServer)) as VersionControlServer;
-                Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
-
-                result.Changes = workspace.GetPendingChanges();
-                m_progress?.Invoke($"[LOG] => Trovate {result.Changes.Length} Check-Out items.");
-
-                var folderFilters = result.Changes.Select(c => c.LocalOrServerFolder).Distinct().ToArray();
-                if (folderFilters.Length > 0 && checkin)
+                using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(tfs, auth))
                 {
-                    var conflicts = workspace.QueryConflicts(folderFilters, true);
-                    if (conflicts.Length > 0)
+                    m_progress?.Invoke($"[LOG] => Enumerazione cambiamenti sul Workspace.");
+                    VersionControlServer versionControl = collection.GetService(typeof(VersionControlServer)) as VersionControlServer;
+                    Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
+
+                    result.Changes = workspace.GetPendingChanges();
+                    m_progress?.Invoke($"[LOG] => Trovate {result.Changes.Length} Check-Out items.");
+
+                    var folderFilters = result.Changes.Select(c => c.LocalOrServerFolder).Distinct().ToArray();
+                    if (folderFilters.Length > 0 && checkin)
                     {
-                        m_progress?.Invoke($"[LOG] => Rilevati {conflicts.Length} conflitti. Aggiorna il workspace prima di continuare");
-                        result.Continue = false;
+                        var conflicts = workspace.QueryConflicts(folderFilters, true);
+                        if (conflicts.Length > 0)
+                        {
+                            m_progress?.Invoke($"[LOG] => Rilevati {conflicts.Length} conflitti. Aggiorna il workspace prima di continuare");
+                            result.Continue = false;
+                        }
+                    }
+
+                    if (result.Changes.Length > 0 && checkin)
+                    {
+                        workspace.CheckIn(result.Changes, $"CI Checkin by {Environment.UserName}");
+                        m_progress?.Invoke($"[LOG] => Check-In effettuato on behalf of {Environment.UserName}.");
                     }
                 }
-
-                if (result.Changes.Length > 0 && checkin)
-                {
-                    workspace.CheckIn(result.Changes, $"CI Checkin by {Environment.UserName}");
-                    m_progress?.Invoke($"[LOG] => Check-In effettuato on behalf of {Environment.UserName}.");
-                }
-
-                return result;
             }
+            catch (Exception ex)
+            {
+                m_progress?.Invoke($"[EXCEPTION] => {ex.Message}");
+                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(ex);
+            }
+
+            return result;
         }
     }
 }

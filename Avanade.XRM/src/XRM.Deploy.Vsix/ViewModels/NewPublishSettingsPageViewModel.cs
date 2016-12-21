@@ -7,6 +7,7 @@ using System.IO;
 using Xrm.Deploy.Vsix.Helpers;
 using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;
+using XRM.Telemetry;
 
 namespace XRM.Deploy.Vsix.ViewModels
 {
@@ -50,7 +51,7 @@ namespace XRM.Deploy.Vsix.ViewModels
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", panelGuid);
-                // TODO: Telemetry
+                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
             }
         }
     }

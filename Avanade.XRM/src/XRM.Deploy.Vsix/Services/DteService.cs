@@ -14,6 +14,14 @@ namespace XRM.Deploy.Vsix.Services
 
         internal string PropertiesDirectory { get; private set; }
 
+        internal string Version
+        {
+            get
+            {
+                return m_environment.Version;
+            }
+        }
+
         internal DteService()
         {
             m_environment = Package.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
