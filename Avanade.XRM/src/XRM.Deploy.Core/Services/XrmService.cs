@@ -1,12 +1,10 @@
-﻿using Microsoft.Xrm.Client;
-using Microsoft.Xrm.Client.Services;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using XRM.Deploy.Core.Factories;
 using XRM.Deploy.Core.Models;
@@ -24,10 +22,15 @@ namespace Avanade.XRM.Deployer.Service
             try
             {
                 m_progress = report;
-                var settings = new ConnectionStringSettings { ConnectionString = connectionString, Name = "Key-CRM" };
-                var connection = new CrmConnection(settings);
-                connection.Timeout = TimeSpan.FromMinutes(10);
-                m_service = new Lazy<IOrganizationService>(() => new OrganizationService(connection));
+                m_service = new Lazy<IOrganizationService>(() =>
+                {
+                    var conn = new CrmServiceClient(connectionString);
+                    var service = (IOrganizationService)conn.OrganizationWebProxyClient != null
+                                ? (IOrganizationService)conn.OrganizationWebProxyClient
+                                : (IOrganizationService)conn.OrganizationServiceProxy;
+
+                    return service;
+                });
             }
             catch (Exception exception)
             {
