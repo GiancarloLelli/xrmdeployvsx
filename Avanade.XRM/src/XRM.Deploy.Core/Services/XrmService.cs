@@ -25,10 +25,19 @@ namespace Avanade.XRM.Deployer.Service
                 m_service = new Lazy<IOrganizationService>(() =>
                 {
                     var conn = new CrmServiceClient(connectionString);
-                    var service = (IOrganizationService)conn.OrganizationWebProxyClient != null
-                                ? (IOrganizationService)conn.OrganizationWebProxyClient
-                                : (IOrganizationService)conn.OrganizationServiceProxy;
+                    IOrganizationService service = null;
 
+                    if (conn.OrganizationServiceProxy != null)
+                    {
+                        conn.OrganizationServiceProxy.Timeout = TimeSpan.FromMinutes(5);
+                        service = conn.OrganizationServiceProxy;
+                    }
+                    else if (conn.OrganizationWebProxyClient != null)
+                    {
+                        service = conn.OrganizationWebProxyClient;
+                    }
+
+                    if (service == null) throw new NullReferenceException("Unable to instantiate IOrganizationService");
                     return service;
                 });
             }
