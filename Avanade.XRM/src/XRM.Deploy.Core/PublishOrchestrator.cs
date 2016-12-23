@@ -12,7 +12,7 @@ namespace XRM.Deploy.Core
     {
         public event EventHandler<string> ReportProgress;
 
-        public void Publish(DeployConfigurationModel deployConfiguration)
+        public void Publish(DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry)
         {
             try
             {
@@ -21,7 +21,7 @@ namespace XRM.Deploy.Core
                 var context = new XrmService(deployConfiguration.CRMConnectionString, reportAction);
                 var userName = !string.IsNullOrEmpty(deployConfiguration.User) ? deployConfiguration.User : Environment.UserName;
                 var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
-                var sourceControl = new SourceControlManager(workspaceName, userName, reportAction);
+                var sourceControl = new SourceControlManager(workspaceName, userName, reportAction, telemetry);
                 var tfsCollectionUri = new Uri(deployConfiguration.TFSCollectionUrl, UriKind.Absolute);
                 var tfsClientCredentials = CredentialsProvider.GetCredentials(deployConfiguration);
                 var sourceControlResult = sourceControl.InitializeWorkspace(tfsCollectionUri, tfsClientCredentials, deployConfiguration.CheckInEnabled);
@@ -44,7 +44,7 @@ namespace XRM.Deploy.Core
             {
                 ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}\n");
                 if (!(exception is DeployException))
-                    TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(exception);
+                    telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
             }
         }
     }

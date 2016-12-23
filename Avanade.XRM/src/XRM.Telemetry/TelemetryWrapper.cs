@@ -8,29 +8,14 @@ namespace XRM.Telemetry
 {
     public class TelemetryWrapper
     {
-        private static volatile TelemetryClient m_client;
-        private static object m_sync = new object();
+        public readonly TelemetryClient Instance;
 
-        public static TelemetryClient Instance
+        public TelemetryWrapper()
         {
-            get
-            {
-                if (m_client == null)
-                {
-                    lock (m_sync)
-                    {
-                        if (m_client == null)
-                        {
-                            var config = TelemetryConfiguration.CreateDefault();
-                            config.InstrumentationKey = "bb1f7c2e-10ad-42ff-8bbf-e9d02846cb5f";
-                            config.DisableTelemetry = Debugger.IsAttached;
-                            m_client = new TelemetryClient(config);
-                        }
-                    }
-                }
-
-                return m_client;
-            }
+            var config = TelemetryConfiguration.CreateDefault();
+            config.InstrumentationKey = "bb1f7c2e-10ad-42ff-8bbf-e9d02846cb5f";
+            config.DisableTelemetry = Debugger.IsAttached;
+            Instance = new TelemetryClient(config);
         }
     }
 

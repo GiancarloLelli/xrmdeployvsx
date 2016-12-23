@@ -14,8 +14,9 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
     internal sealed class Deploy
     {
         private Guid m_pane;
-        private readonly Package m_package;
-        private readonly DteService m_service;
+        readonly Package m_package;
+        readonly DteService m_service;
+        readonly TelemetryWrapper m_telemetry;
         public const int CommandId = 0x0100;
         public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
 
@@ -28,9 +29,11 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         private Deploy(Package package)
         {
             if (package == null) throw new ArgumentNullException("Package");
+
             m_package = package;
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService();
+            m_telemetry = new TelemetryWrapper();
 
             OleMenuCommandService commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
@@ -48,7 +51,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
                 if (string.IsNullOrEmpty(publishSettigsPath))
                 {
-                    var dialog = new NewPublishSettingsPage(m_service);
+                    var dialog = new NewPublishSettingsPage(m_service, m_telemetry);
                     dialog.ShowDialog();
                     publishSettigsPath = (dialog.DataContext as NewPublishSettingsPageViewModel)?.FilePath;
                 }
@@ -59,13 +62,13 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var deployConfiguration = XmlObjectsHelper.Deserialize<DeployConfigurationModelFacade>(publishSettigsPath);
                 var orchestrator = new PublishOrchestrator();
                 orchestrator.ReportProgress += LogProgress;
-                orchestrator.Publish(deployConfiguration.InnerObject);
+                orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry);
                 orchestrator.ReportProgress -= LogProgress;
             }
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
-                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
+                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
             }
         }
 

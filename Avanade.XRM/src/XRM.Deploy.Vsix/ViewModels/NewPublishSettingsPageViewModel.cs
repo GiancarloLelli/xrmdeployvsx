@@ -20,12 +20,14 @@ namespace XRM.Deploy.Vsix.ViewModels
         internal string FilePath { get; set; }
 
         private readonly DteService m_service;
+        private readonly TelemetryWrapper m_telemetry;
 
-        internal NewPublishSettingsPageViewModel(DteService service)
+        internal NewPublishSettingsPageViewModel(DteService service, TelemetryWrapper telemetry)
         {
             SaveConfigurationCommand = new RelayCommand(() => Save());
             Configuration = new DeployConfigurationModelFacade();
             m_service = service;
+            m_telemetry = telemetry;
         }
 
         private void Save()
@@ -51,7 +53,7 @@ namespace XRM.Deploy.Vsix.ViewModels
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", panelGuid);
-                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
+                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
             }
         }
     }

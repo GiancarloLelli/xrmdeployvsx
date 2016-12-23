@@ -12,12 +12,14 @@ namespace XRM.Deploy.Core.Managers
         readonly string m_workspace;
         readonly string m_user;
         readonly Action<string> m_progress;
+        readonly TelemetryWrapper m_telemetry;
 
-        internal SourceControlManager(string workspace, string user, Action<string> reportProgress)
+        internal SourceControlManager(string workspace, string user, Action<string> reportProgress, TelemetryWrapper telemetry)
         {
             m_workspace = workspace;
             m_user = user;
             m_progress = reportProgress;
+            m_telemetry = telemetry;
         }
 
         internal SourceControlResultModel InitializeWorkspace(Uri tfs, TfsClientCredentials auth, bool checkin)
@@ -55,7 +57,7 @@ namespace XRM.Deploy.Core.Managers
             catch (Exception ex)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {ex.Message}");
-                TelemetryWrapper.Instance.TrackExceptionWithCustomMetrics(ex);
+                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex);
             }
 
             return result;
