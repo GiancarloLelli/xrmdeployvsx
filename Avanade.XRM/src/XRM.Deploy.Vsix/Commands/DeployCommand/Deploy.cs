@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Settings;
 using System;
 using System.ComponentModel.Design;
 using Xrm.Deploy.Vsix.Helpers;
@@ -17,7 +19,8 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         readonly Package m_package;
         readonly DteService m_service;
         readonly TelemetryWrapper m_telemetry;
-        public const int CommandId = 0x0100;
+        public const int DeployCommandId = 0x1023;
+        public const int InitCommandId = 0x1022;
         public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
 
         public static Deploy Instance { get; private set; }
@@ -28,23 +31,43 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
         private Deploy(Package package)
         {
-            if (package == null) throw new ArgumentNullException("Package");
+            if (package == null) throw new ArgumentNullException(nameof(package));
 
             m_package = package;
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService();
             m_telemetry = new TelemetryWrapper();
 
-            OleMenuCommandService commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                var menuCommandID = new CommandID(CommandSet, CommandId);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
-                commandService.AddCommand(menuItem);
+                var deployMenuCommandID = new CommandID(CommandSet, DeployCommandId);
+                var deployMenuItem = new OleMenuCommand(DeployMenuItemCallback, HandleMenuItemChange, HandleMenuItemVisibility, deployMenuCommandID);
+                commandService.AddCommand(deployMenuItem);
+
+                var initializeMenuCommandId = new CommandID(CommandSet, InitCommandId);
+                var initMenuItem = new OleMenuCommand(InitMenuItemCallback, HandleMenuItemChange, HandleMenuItemVisibility, initializeMenuCommandId);
+                commandService.AddCommand(initMenuItem);
             }
         }
 
-        private void MenuItemCallback(object sender, EventArgs e)
+        private void HandleMenuItemVisibility(object sender, EventArgs e)
+        {
+            var menu = sender as OleMenuCommand;
+            var isDeploy = menu.CommandID.ID == DeployCommandId;
+
+            var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
+            var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            var isDeployEnabled = settingsStore.GetBoolean("CRMToolkit", m_service.GetSelectedProjectName(), false);
+
+            var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var initCommand = menuService.FindCommand(new CommandID(CommandSet, InitCommandId));
+
+            if (initCommand != null) initCommand.Enabled = !isDeployEnabled;
+            if (isDeploy) menu.Enabled = isDeployEnabled;
+        }
+
+        private void DeployMenuItemCallback(object sender, EventArgs e)
         {
             try
             {
@@ -72,6 +95,31 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             }
         }
 
+        private void InitMenuItemCallback(object sender, EventArgs e)
+        {
+            try
+            {
+                var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
+                var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+                if (!settingsStore.CollectionExists("CRMToolkit")) settingsStore.CreateCollection("CRMToolkit");
+                settingsStore.SetBoolean("CRMToolkit", m_service.GetSelectedProjectName(), true);
+
+                var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+                var deployCommand = menuService.FindCommand(new CommandID(CommandSet, DeployCommandId));
+                if (deployCommand != null) deployCommand.Enabled = true;
+
+                var initCommand = menuService.FindCommand(new CommandID(CommandSet, InitCommandId));
+                if (initCommand != null) initCommand.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
+                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
+            }
+        }
+
         private void LogProgress(object sender, string e) => m_service.LogMessage(e, m_pane);
+
+        private void HandleMenuItemChange(object sender, EventArgs e) { return; }
     }
 }

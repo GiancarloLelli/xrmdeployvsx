@@ -39,6 +39,13 @@ namespace XRM.Deploy.Vsix.Services
             return File.Exists(publishFilePath) ? publishFilePath : string.Empty;
         }
 
+        internal string GetSelectedProjectName()
+        {
+            var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
+            var selectedProject = selectedProjectBase as Project;
+            return selectedProject?.FileName;
+        }
+
         internal void LogMessage(string e, Guid pane)
         {
             IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
