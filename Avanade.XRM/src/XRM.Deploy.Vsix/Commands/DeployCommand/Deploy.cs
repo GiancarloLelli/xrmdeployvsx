@@ -10,6 +10,7 @@ using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
 using XRM.Deploy.Vsix.Views;
 using XRM.Telemetry;
+using Async = System.Threading.Tasks;
 
 namespace XRM.Deploy.Vsix.Commands.DeployCommand
 {
@@ -85,8 +86,11 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var deployConfiguration = XmlObjectsHelper.Deserialize<DeployConfigurationModelFacade>(publishSettigsPath);
                 var orchestrator = new PublishOrchestrator();
                 orchestrator.ReportProgress += LogProgress;
-                orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry);
-                orchestrator.ReportProgress -= LogProgress;
+                Async.Task.Factory.StartNew(() =>
+                {
+                    orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry);
+                    orchestrator.ReportProgress -= LogProgress;
+                });
             }
             catch (Exception ex)
             {

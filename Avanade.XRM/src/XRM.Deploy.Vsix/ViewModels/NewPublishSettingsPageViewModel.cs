@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.VisualStudio.PlatformUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,7 +14,7 @@ namespace XRM.Deploy.Vsix.ViewModels
 {
     internal class NewPublishSettingsPageViewModel : ViewModelBase
     {
-        public RelayCommand SaveConfigurationCommand { get; set; }
+        public RelayCommand<DialogWindow> SaveConfigurationCommand { get; set; }
 
         public DeployConfigurationModelFacade Configuration { get; set; }
 
@@ -24,13 +25,13 @@ namespace XRM.Deploy.Vsix.ViewModels
 
         internal NewPublishSettingsPageViewModel(DteService service, TelemetryWrapper telemetry)
         {
-            SaveConfigurationCommand = new RelayCommand(() => Save());
+            SaveConfigurationCommand = new RelayCommand<DialogWindow>((w) => Save(w));
             Configuration = new DeployConfigurationModelFacade();
             m_service = service;
             m_telemetry = telemetry;
         }
 
-        private void Save()
+        private void Save(DialogWindow window)
         {
             var panelGuid = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
 
@@ -49,6 +50,8 @@ namespace XRM.Deploy.Vsix.ViewModels
                 var fullPath = $"{m_service.PropertiesDirectory}\\AvanadeToolkit.publishSettings";
                 File.WriteAllText(fullPath, xmlDump);
                 FilePath = fullPath;
+
+                window.Close();
             }
             catch (Exception ex)
             {

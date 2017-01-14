@@ -30,15 +30,19 @@ namespace XRM.Deploy.Core
                 if (!sourceControlResult.Continue) return;
 
                 container = new WebResourceManager(sourceControlResult.Changes, deployConfiguration.Prefix, context);
-                ReportProgress?.Invoke(this, $"[LOG] => Trovate {container.WebResources.Count} Web Resource.");
-                ReportProgress?.Invoke(this, $"[STS] => Add: {container.AddedItems} - Edit: {container.EditedItems} - Delete: {container.DeletedItems}");
-                ReportProgress?.Invoke(this, $"[LOG] => '{deployConfiguration.Prefix}' utilizzato come root.");
-                ReportProgress?.Invoke(this, $"[LOG] => Fetch soluzione '{deployConfiguration.Solution}' da CRM.");
-                container.EnsureContinue(deployConfiguration.Solution);
+                ReportProgress?.Invoke(this, $"[TFS] => Add: {container.AddedItems} - Edit: {container.EditedItems} - Delete: {container.DeletedItems}");
 
-                ReportProgress?.Invoke(this, $"[LOG] => Generazione pool OrganizationRequest & scrittura su CRM.");
-                context.Flush(container.BuildRequestList(deployConfiguration.Solution));
-                ReportProgress?.Invoke(this, $"[LOG] => Scrittura su CRM completata.\n");
+                if (container.WebResources.Count > 0)
+                {
+                    ReportProgress?.Invoke(this, $"[CRM] => Trovate {container.WebResources.Count} Web Resource.");
+                    ReportProgress?.Invoke(this, $"[CRM] => '{deployConfiguration.Prefix}' utilizzato come root.");
+                    ReportProgress?.Invoke(this, $"[CRM] => Fetch soluzione '{deployConfiguration.Solution}' da CRM.");
+                    container.EnsureContinue(deployConfiguration.Solution);
+
+                    ReportProgress?.Invoke(this, $"[CRM] => Generazione pool OrganizationRequest & scrittura su CRM.");
+                    context.Flush(container.BuildRequestList(deployConfiguration.Solution));
+                    ReportProgress?.Invoke(this, $"[CRM] => Scrittura su CRM completata.\n");
+                }
             }
             catch (Exception exception)
             {

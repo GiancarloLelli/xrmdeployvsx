@@ -9,7 +9,7 @@
             ResizeMode="NoResize" ShowInTaskbar="True" HasMinimizeButton="True"
             Title="Avanade CRM Toolkit - New Publish Settings"
             WindowStartupLocation="CenterScreen"
-            Width="500" Height="465">
+            Width="500" Height="465" x:Name="WizardWindow">
     <Grid>
         <StackPanel>
             <GroupBox Margin="5" VerticalAlignment="Top">
@@ -114,7 +114,7 @@
                 </FlowDocument>
             </RichTextBox>
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,5,0">
-                <Button Content="Ok" Width="90" Height="30" Margin="0,0,5,0" Command="{Binding SaveConfigurationCommand}" />
+                <Button Content="Ok" Width="90" Height="30" Margin="0,0,5,0" Command="{Binding SaveConfigurationCommand}" CommandParameter="{Binding ElementName=WizardWindow}" />
                 <Button Content="Cancel" Width="90" Height="30" Click="CancelPublish" />
             </StackPanel>
         </StackPanel>
