@@ -46,6 +46,13 @@ namespace XRM.Deploy.Vsix.Services
             return selectedProject?.FileName;
         }
 
+        internal string GetSelectedProjectNameForAnalytics()
+        {
+            var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
+            var selectedProject = selectedProjectBase as Project;
+            return selectedProject?.Name;
+        }
+
         internal void LogMessage(string e, Guid pane)
         {
             IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;

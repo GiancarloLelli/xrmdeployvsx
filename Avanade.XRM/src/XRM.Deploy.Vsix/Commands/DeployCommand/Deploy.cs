@@ -73,7 +73,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         {
             try
             {
-                var projectName = m_service.GetSelectedProjectName();
+                var projectName = m_service.GetSelectedProjectNameForAnalytics();
                 m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
 
                 var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
@@ -109,13 +109,12 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         {
             try
             {
-                var projectName = m_service.GetSelectedProjectName();
-                m_telemetry.TrackCustomEventWithCustomMetrics("Project Initialization", new MetricData("Project Name", projectName));
+                m_telemetry.TrackCustomEventWithCustomMetrics("Project Initialization", new MetricData("Project Name", m_service.GetSelectedProjectNameForAnalytics()));
 
                 var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
                 var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
                 if (!settingsStore.CollectionExists("CRMToolkit")) settingsStore.CreateCollection("CRMToolkit");
-                settingsStore.SetBoolean("CRMToolkit", projectName, true);
+                settingsStore.SetBoolean("CRMToolkit", m_service.GetSelectedProjectName(), true);
 
                 var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
                 var deployCommand = menuService.FindCommand(new CommandID(CommandSet, DeployCommandId));

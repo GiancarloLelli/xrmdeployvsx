@@ -15,6 +15,8 @@ namespace XRM.Telemetry
 
         public TelemetryWrapper(string visualStudioVersion)
         {
+            VisualStudioVersion = visualStudioVersion;
+
             var config = TelemetryConfiguration.CreateDefault();
             config.InstrumentationKey = "bb1f7c2e-10ad-42ff-8bbf-e9d02846cb5f";
             config.DisableTelemetry = Debugger.IsAttached;
