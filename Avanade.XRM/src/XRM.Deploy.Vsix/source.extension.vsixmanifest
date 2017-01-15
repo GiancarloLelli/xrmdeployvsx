@@ -4,7 +4,9 @@
     <Identity Id="ITDC-AVACRMTLK" Version="1.0" Language="en-US" Publisher="Giancarlo Lelli" />
     <DisplayName>Avanade CRM Toolkit</DisplayName>
     <Description xml:space="preserve">Avanade CRM Toolkit. Use this product to deploy directly from Visual Studio any frontend customization for Microsoft Dynamics CRM.</Description>
+    <License>license.txt</License>
     <Icon>Assets\Logo.png</Icon>
+    <Tags>Dynamics, XRM, CRM, Dynamics365, 2016, D365, 365, SDK</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Version="[14.0,15.0)" Id="Microsoft.VisualStudio.Pro" />
