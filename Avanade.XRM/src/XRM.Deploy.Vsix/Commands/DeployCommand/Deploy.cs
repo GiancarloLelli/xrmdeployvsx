@@ -10,6 +10,7 @@ using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
 using XRM.Deploy.Vsix.Views;
 using XRM.Telemetry;
+using XRM.Telemetry.Models;
 using Async = System.Threading.Tasks;
 
 namespace XRM.Deploy.Vsix.Commands.DeployCommand
@@ -37,7 +38,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             m_package = package;
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService();
-            m_telemetry = new TelemetryWrapper();
+            m_telemetry = new TelemetryWrapper(m_service.Version);
 
             var commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
@@ -58,7 +59,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             var isDeploy = menu.CommandID.ID == DeployCommandId;
 
             var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
-            var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
             var isDeployEnabled = settingsStore.GetBoolean("CRMToolkit", m_service.GetSelectedProjectName(), false);
 
             var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -72,6 +73,9 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         {
             try
             {
+                var projectName = m_service.GetSelectedProjectName();
+                m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
+
                 var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
                 if (string.IsNullOrEmpty(publishSettigsPath))
                 {
@@ -91,11 +95,13 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                     orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry);
                     orchestrator.ReportProgress -= LogProgress;
                 });
+
+                m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Finished", new MetricData("Project Name", projectName));
             }
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
+                m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
         }
 
@@ -103,10 +109,13 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         {
             try
             {
+                var projectName = m_service.GetSelectedProjectName();
+                m_telemetry.TrackCustomEventWithCustomMetrics("Project Initialization", new MetricData("Project Name", projectName));
+
                 var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
                 var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
                 if (!settingsStore.CollectionExists("CRMToolkit")) settingsStore.CreateCollection("CRMToolkit");
-                settingsStore.SetBoolean("CRMToolkit", m_service.GetSelectedProjectName(), true);
+                settingsStore.SetBoolean("CRMToolkit", projectName, true);
 
                 var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
                 var deployCommand = menuService.FindCommand(new CommandID(CommandSet, DeployCommandId));
@@ -118,7 +127,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
+                m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
         }
 

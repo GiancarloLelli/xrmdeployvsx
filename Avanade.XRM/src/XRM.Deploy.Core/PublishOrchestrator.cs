@@ -48,7 +48,7 @@ namespace XRM.Deploy.Core
             {
                 ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}\n");
                 if (!(exception is DeployException))
-                    telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                    telemetry.TrackExceptionWithCustomMetrics(exception);
             }
         }
     }

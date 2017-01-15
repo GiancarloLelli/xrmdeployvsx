@@ -56,7 +56,7 @@ namespace XRM.Deploy.Vsix.ViewModels
             catch (Exception ex)
             {
                 m_service.LogMessage($"[EXCEPTION] => {ex.Message}", panelGuid);
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex, m_service.Version);
+                m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
         }
     }

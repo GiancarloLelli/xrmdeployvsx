@@ -46,7 +46,7 @@ namespace Avanade.XRM.Deployer.Service
             catch (Exception exception)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Avanade.XRM.Deployer.Service
             catch (Exception exception)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
             return solution;
@@ -107,7 +107,7 @@ namespace Avanade.XRM.Deployer.Service
             catch (Exception exception)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
             return new Tuple<OrganizationRequest, OrganizationRequest, OrganizationRequest>(requestGeneral, requestPublish, requestAddToSolution);
@@ -151,7 +151,7 @@ namespace Avanade.XRM.Deployer.Service
             catch (Exception exception)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Avanade.XRM.Deployer.Service
             catch (Exception exception)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
             return meta;
@@ -197,7 +197,7 @@ namespace Avanade.XRM.Deployer.Service
             catch (Exception exception)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(exception);
+                m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
             return id;

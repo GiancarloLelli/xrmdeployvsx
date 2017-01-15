@@ -58,7 +58,7 @@ namespace XRM.Deploy.Core.Managers
             catch (Exception ex)
             {
                 m_progress?.Invoke($"[EXCEPTION] => {ex.Message}");
-                m_telemetry.Instance.TrackExceptionWithCustomMetrics(ex);
+                m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
 
             return result;
