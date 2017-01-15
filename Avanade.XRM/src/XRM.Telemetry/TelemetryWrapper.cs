@@ -12,10 +12,12 @@ namespace XRM.Telemetry
     {
         public readonly TelemetryClient Instance;
         public readonly string VisualStudioVersion;
+        public readonly string VsxVersion;
 
-        public TelemetryWrapper(string visualStudioVersion)
+        public TelemetryWrapper(string visualStudioVersion, string vsxVersion)
         {
             VisualStudioVersion = visualStudioVersion;
+            VsxVersion = vsxVersion;
 
             var config = TelemetryConfiguration.CreateDefault();
             config.InstrumentationKey = "bb1f7c2e-10ad-42ff-8bbf-e9d02846cb5f";
@@ -33,6 +35,7 @@ namespace XRM.Telemetry
             metrics.Add("Machine Name", Environment.MachineName);
             metrics.Add("OS", Environment.OSVersion.ToString());
             metrics.Add("Visual Studio Version", client.VisualStudioVersion);
+            metrics.Add("Toolkit Version", client.VsxVersion);
             client.Instance.TrackException(ex, metrics);
         }
 
@@ -41,6 +44,11 @@ namespace XRM.Telemetry
             var eventData = new EventTelemetry(eventName);
             eventData.Timestamp = DateTime.UtcNow;
             eventData.Properties.Add(data.Key, data.Value);
+            eventData.Properties.Add("Username", Environment.UserName);
+            eventData.Properties.Add("Machine Name", Environment.MachineName);
+            eventData.Properties.Add("OS", Environment.OSVersion.ToString());
+            eventData.Properties.Add("Visual Studio Version", client.VisualStudioVersion);
+            eventData.Properties.Add("Toolkit Version", client.VsxVersion);
             client.Instance.TrackEvent(eventData);
         }
     }

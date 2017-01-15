@@ -10,6 +10,7 @@ using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
 using XRM.Deploy.Vsix.Views;
 using XRM.Telemetry;
+using XRM.Telemetry.Helpers;
 using XRM.Telemetry.Models;
 using Async = System.Threading.Tasks;
 
@@ -38,7 +39,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             m_package = package;
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService();
-            m_telemetry = new TelemetryWrapper(m_service.Version);
+            m_telemetry = new TelemetryWrapper(m_service.Version, VersionHelper.GetVersionFromManifest());
 
             var commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
