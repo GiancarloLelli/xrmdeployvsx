@@ -89,7 +89,7 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Password" VerticalAlignment="Center" />
-                            <PasswordBox Grid.Column="1" HorizontalAlignment="Stretch" />
+                            <PasswordBox Grid.Column="1" HorizontalAlignment="Stretch" PasswordChanged="PasswordChanged" />
                         </Grid>
                         <Grid Height="20" Margin="5">
                             <Grid.ColumnDefinitions>
