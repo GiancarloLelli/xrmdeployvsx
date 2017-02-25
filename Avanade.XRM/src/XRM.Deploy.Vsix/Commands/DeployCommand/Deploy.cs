@@ -3,8 +3,10 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
 using System;
 using System.ComponentModel.Design;
+using System.IO;
 using Xrm.Deploy.Vsix.Helpers;
 using XRM.Deploy.Core;
+using XRM.Deploy.Core.Helpers;
 using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
@@ -22,8 +24,9 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         private readonly Package m_package;
         private readonly DteService m_service;
         private readonly TelemetryWrapper m_telemetry;
-        public const int DeployCommandId = 0x1023;
-        public const int InitCommandId = 0x1022;
+        public const int InitCommandId = 0x1023;
+        public const int DeployCommandId = 0x1024;
+        public const int SingleDeployCommandId = 0x1025;
         public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
 
         public static Deploy Instance { get; private set; }
@@ -51,6 +54,10 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var initializeMenuCommandId = new CommandID(CommandSet, InitCommandId);
                 var initMenuItem = new OleMenuCommand(InitMenuItemCallback, HandleMenuItemChange, HandleMenuItemVisibility, initializeMenuCommandId);
                 commandService.AddCommand(initMenuItem);
+
+                var singeDeplotMenuCommandId = new CommandID(CommandSet, SingleDeployCommandId);
+                var initSingleDeploy = new OleMenuCommand(SingleDeployMenuItemCallback, HandleMenuItemChange, HandleMenuItemVisibility, singeDeplotMenuCommandId);
+                commandService.AddCommand(initSingleDeploy);
             }
         }
 
@@ -58,22 +65,34 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         {
             var menu = sender as OleMenuCommand;
             var isDeploy = menu.CommandID.ID == DeployCommandId;
+            var isSingleDeploy = menu.CommandID.ID == SingleDeployCommandId;
 
             var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
             var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
             var isDeployEnabled = settingsStore.GetBoolean("CRMToolkit", m_service.GetSelectedProjectName(), false);
 
-            var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            var initCommand = menuService.FindCommand(new CommandID(CommandSet, InitCommandId));
+            if (isDeploy)
+            {
+                var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+                var initCommand = menuService.FindCommand(new CommandID(CommandSet, InitCommandId));
 
-            if (initCommand != null) initCommand.Enabled = !isDeployEnabled;
-            if (isDeploy) menu.Enabled = isDeployEnabled;
+                if (initCommand != null) initCommand.Enabled = !isDeployEnabled;
+                if (isDeploy) menu.Enabled = isDeployEnabled;
+            }
+            else if (isSingleDeploy)
+            {
+                var objectName = m_service.GetSelectedObjectName();
+                var file = new FileInfo(objectName);
+                menu.Enabled = isDeployEnabled && CrmExtensionsHelper.GetCrmExtensionNumber(objectName) != 99;
+                menu.Text = $"Deploy {file.Name} to CRM";
+            }
         }
 
         private void DeployMenuItemCallback(object sender, EventArgs e)
         {
             try
             {
+                var singleResourceName = e is SingleResourceEventArgs ? (e as SingleResourceEventArgs).File : null;
                 var projectName = m_service.GetSelectedProjectNameForAnalytics();
                 m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
 
@@ -94,7 +113,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
                 Async.Task.Factory.StartNew(() =>
                 {
-                    orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry);
+                    orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry, singleResourceName);
                     orchestrator.ReportProgress -= LogProgress;
                 });
 
@@ -132,8 +151,14 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             }
         }
 
-        private void LogProgress(object sender, string e) => m_service.LogMessage(e, m_pane);
+        private void SingleDeployMenuItemCallback(object sender, EventArgs e)
+        {
+            var fileInfo = new FileInfo(m_service.GetSelectedObjectName());
+            DeployMenuItemCallback(sender, new SingleResourceEventArgs(fileInfo.Name));
+        }
 
-        private void HandleMenuItemChange(object sender, EventArgs e) { return; }
+        private void HandleMenuItemChange(object sender, EventArgs e) { }
+
+        private void LogProgress(object sender, string e) => m_service.LogMessage(e, m_pane);
     }
 }

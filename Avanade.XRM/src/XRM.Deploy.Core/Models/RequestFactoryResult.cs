@@ -6,8 +6,6 @@ namespace XRM.Deploy.Core.Models
     {
         public OrganizationRequest General { get; set; }
 
-        public OrganizationRequest AddToSolution { get; set; }
-
         public OrganizationRequest Publish { get; set; }
     }
 }

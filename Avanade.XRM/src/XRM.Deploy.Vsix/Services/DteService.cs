@@ -46,6 +46,25 @@ namespace XRM.Deploy.Vsix.Services
             return selectedProject?.FileName;
         }
 
+        public string GetSelectedObjectName()
+        {
+            var fileName = string.Empty;
+            var projectSelectedItems = m_environment.ToolWindows.SolutionExplorer.SelectedItems as object[];
+
+            if (projectSelectedItems != null)
+            {
+                var firstObjectitem = projectSelectedItems.FirstOrDefault() as UIHierarchyItem;
+                if (firstObjectitem != null)
+                {
+                    var hierarchyItem = (firstObjectitem as UIHierarchyItem)?.Object as ProjectItem;
+                    var fullPath = hierarchyItem.Properties.Item("FullPath").Value.ToString();
+                    fileName = firstObjectitem.IsSelected ? fullPath : string.Empty;
+                }
+            }
+
+            return fileName;
+        }
+
         public string GetSelectedProjectNameForAnalytics()
         {
             var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();

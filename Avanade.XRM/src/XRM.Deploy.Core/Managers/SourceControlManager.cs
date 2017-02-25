@@ -42,6 +42,8 @@ namespace XRM.Deploy.Core.Managers
                     Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
 
                     result.Changes = workspace.GetPendingChanges();
+                    m_result = result;
+
                     m_progress?.Invoke($"[TFS] => Trovate {result.Changes.Length} Check-Out items.");
 
                     var folderFilters = result.Changes.Select(c => c.LocalOrServerFolder).Distinct().ToArray();

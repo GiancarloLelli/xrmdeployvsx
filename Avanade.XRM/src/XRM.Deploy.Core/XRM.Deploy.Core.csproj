@@ -282,6 +282,7 @@
   <ItemGroup>
     <Compile Include="Factories\OrganizationRequestFactory.cs" />
     <Compile Include="Fallback\ToolkitException.cs" />
+    <Compile Include="Helpers\CrmExtensionsHelper.cs" />
     <Compile Include="Models\RequestFactoryResult.cs" />
     <Compile Include="Providers\CredentialsProvider.cs" />
     <Compile Include="Extensions\EntityExtension.cs" />

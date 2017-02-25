@@ -59,6 +59,7 @@
     <Compile Include="Commands\DeployCommand\DeployPackage.cs" />
     <Compile Include="Helpers\XmlObjectsHelper.cs" />
     <Compile Include="Models\DeployConfigurationModelFacade.cs" />
+    <Compile Include="Models\SingleResourceEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DteService.cs" />
     <Compile Include="ViewModels\NewPublishSettingsPageViewModel.cs" />

@@ -17,14 +17,16 @@ namespace Avanade.XRM.Deployer.Service
         private readonly Lazy<IOrganizationService> m_service;
         private readonly Action<string> m_progress;
         private readonly TelemetryWrapper m_telemetry;
-        private EntityMetadata m_meta;
+        private readonly string m_solution;
 
-        public XrmService(string connectionString, TelemetryWrapper telemetry, Action<string> report)
+        public XrmService(string connectionString, string solution, TelemetryWrapper telemetry, Action<string> report)
         {
             try
             {
                 m_progress = report;
                 m_telemetry = telemetry;
+                m_solution = solution;
+
                 m_service = new Lazy<IOrganizationService>(() =>
                 {
                     var conn = new CrmServiceClient(connectionString);
@@ -42,8 +44,6 @@ namespace Avanade.XRM.Deployer.Service
 
                     if (service == null)
                         throw new NullReferenceException("Unable to instantiate IOrganizationService");
-
-                    m_meta = GetMetadata("webresource");
 
                     return service;
                 });
@@ -75,7 +75,7 @@ namespace Avanade.XRM.Deployer.Service
             return solution;
         }
 
-        public RequestFactoryResult RequestFactory(string changeType, string resourceName, Entity webResource, string solution)
+        public RequestFactoryResult RequestFactory(string changeType, string resourceName, Entity webResource)
         {
             var requestFactoryResult = new RequestFactoryResult();
 
@@ -85,7 +85,6 @@ namespace Avanade.XRM.Deployer.Service
                 {
                     case "add":
                         requestFactoryResult.General = OrganizationRequestFactory.CreateFactory(webResource);
-                        requestFactoryResult.AddToSolution = OrganizationRequestFactory.AddSolutionFactory(false, 61, m_meta.MetadataId.Value, solution);
                         break;
                     case "edit":
                     case "delete":
@@ -115,9 +114,10 @@ namespace Avanade.XRM.Deployer.Service
             return requestFactoryResult;
         }
 
-        public bool Flush(IEnumerable<OrganizationRequest> reqs)
+        public bool Flush(List<OrganizationRequest> reqs)
         {
             bool isFaulted = false;
+            var addToSolutionRequests = new List<OrganizationRequest>();
 
             try
             {
@@ -130,7 +130,7 @@ namespace Avanade.XRM.Deployer.Service
                     ExecuteMultipleRequest req = new ExecuteMultipleRequest()
                     {
                         Requests = new OrganizationRequestCollection(),
-                        Settings = new ExecuteMultipleSettings { ReturnResponses = false, ContinueOnError = false }
+                        Settings = new ExecuteMultipleSettings { ReturnResponses = true, ContinueOnError = false }
                     };
 
                     req.Requests.AddRange(batch);
@@ -145,7 +145,19 @@ namespace Avanade.XRM.Deployer.Service
                             m_progress?.Invoke($"[ERROR] => Index: {index} - Error: {results.Fault.Message}");
                         }
                     }
+                    else
+                    {
+                        var createResponse = res.Responses.Where(x => (x.Response as CreateResponse) != null);
+                        foreach (var creationResponseItem in createResponse)
+                        {
+                            var creationRsponse = creationResponseItem.Response as CreateResponse;
+                            addToSolutionRequests.Add(OrganizationRequestFactory.AddSolutionFactory(false, 61, creationRsponse.id, m_solution));
+                        }
+                    }
                 }
+
+                if (addToSolutionRequests.Count > 0)
+                    isFaulted = isFaulted || Flush(addToSolutionRequests);
             }
             catch (Exception exception)
             {

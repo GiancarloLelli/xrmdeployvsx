@@ -8,6 +8,9 @@
       <Group guid="guidDeployPackageCmdSet" id="MyRoot" priority="0x0000">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
       </Group>
+      <Group guid="guidDeployPackageCmdSet" id="MyProjectRoot" priority="0x0000">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+      </Group>
       <Group guid="guidDeployPackageCmdSet" id="MySubMenuGroup" priority="0x0100">
         <Parent guid="guidDeployPackageCmdSet" id="MyMenuGroup"/>
       </Group>
@@ -18,12 +21,13 @@
         <Parent guid="guidDeployPackageCmdSet" id="MyRoot"/>
         <CommandFlag>IconAndText</CommandFlag>
         <Strings>
-          <ButtonText>CRM Tooltkit - WebResource Deploy</ButtonText>
+          <ButtonText>CRM Tooltkit - Web Resource Manager</ButtonText>
         </Strings>
       </Menu>
     </Menus>
 
     <Buttons>
+      <!-- Multiple items deploy CMDs -->
       <Button guid="guidDeployPackageCmdSet" id="InitId" type="Button" priority="0x0000">
         <Parent guid="guidDeployPackageCmdSet" id="MySubMenuGroup" />
         <CommandFlag>TextOnly</CommandFlag>
@@ -38,17 +42,28 @@
           <ButtonText>Deploy Changes to CRM</ButtonText>
         </Strings>
       </Button>
+      
+      <!-- Single item deploy CMD -->
+      <Button guid="guidDeployPackageCmdSet" id="SingleDeployId" type="Button" priority="0x0100">
+        <Parent guid="guidDeployPackageCmdSet" id="MyProjectRoot" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText>Deploy to CRM</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
     
   </Commands>
   <Symbols>
     <GuidSymbol name="guidDeployPackage" value="{6d049236-2a90-46f4-a937-5862912036fb}" />
     <GuidSymbol name="guidDeployPackageCmdSet" value="{222af809-1598-498f-a9d7-6b130d420527}">
+      <IDSymbol name="MyProjectRoot" value="0x1018" />
       <IDSymbol name="MyRoot" value="0x1019" />
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="MySubMenuGroup" value="0x1021" />
-      <IDSymbol name="InitId" value="0x1022" />
-      <IDSymbol name="DeployId" value="0x1023" />
+      <IDSymbol name="InitId" value="0x1023" />
+      <IDSymbol name="DeployId" value="0x1024" />
+      <IDSymbol name="SingleDeployId" value="0x1025" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

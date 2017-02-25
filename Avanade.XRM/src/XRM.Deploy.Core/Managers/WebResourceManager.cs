@@ -73,11 +73,10 @@ namespace XRM.Deploy.Core.Managers
             foreach (var resource in WebResources)
             {
                 if (string.IsNullOrEmpty(resource.FullName)) continue;
-                var factory = m_context.RequestFactory(resource.ChangeType, resource.FullName, resource.ToEntity(), solution);
+                var factory = m_context.RequestFactory(resource.ChangeType, resource.FullName, resource.ToEntity());
 
                 factory.General.SetIfNotNull("SolutionUniqueName", solution);
                 requests.AddIfNotNull(factory.General);
-                requests.AddIfNotNull(factory.AddToSolution);
                 requests.AddIfNotNull(factory.Publish);
             }
 
