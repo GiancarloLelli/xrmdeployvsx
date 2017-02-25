@@ -7,6 +7,7 @@ using XRM.Deploy.Core.Fallback;
 using XRM.Deploy.Core.Managers;
 using XRM.Deploy.Core.Providers;
 using XRM.Telemetry;
+using XRM.Telemetry.Models;
 
 namespace XRM.Deploy.Core
 {
@@ -14,7 +15,7 @@ namespace XRM.Deploy.Core
     {
         public event EventHandler<string> ReportProgress;
 
-        public void Publish(DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, string singleResourceName)
+        public void Publish(DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, string singleResourceName, string project)
         {
             try
             {
@@ -38,7 +39,7 @@ namespace XRM.Deploy.Core
                     changeList = filteredChangeList;
                 }
 
-                PublishImpl(context, sourceControl, deployConfiguration, telemetry, changeList);
+                PublishImpl(context, sourceControl, deployConfiguration, telemetry, changeList, project);
             }
             catch (Exception exception)
             {
@@ -48,7 +49,7 @@ namespace XRM.Deploy.Core
             }
         }
 
-        private void PublishImpl(XrmService context, SourceControlManager sourceControl, DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, PendingChange[] changes)
+        private void PublishImpl(XrmService context, SourceControlManager sourceControl, DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, PendingChange[] changes, string project)
         {
             try
             {
@@ -72,6 +73,8 @@ namespace XRM.Deploy.Core
                         sourceControl.CheckInChanges();
                     }
                 }
+
+                telemetry.TrackCustomEventWithCustomMetrics("Deploy Finished", new MetricData("Project Name", project));
             }
             catch (Exception exception)
             {
