@@ -28,6 +28,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         public const int InitCommandId = 0x1023;
         public const int DeployCommandId = 0x1024;
         public const int SingleDeployCommandId = 0x1025;
+        private const string SETTINGS_STORE = "CRMToolkit";
         public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
 
         public static Deploy Instance { get; private set; }
@@ -38,9 +39,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
         private Deploy(Package package)
         {
-            if (package == null) throw new ArgumentNullException(nameof(package));
-
-            m_package = package;
+            m_package = package ?? throw new ArgumentNullException(nameof(package));
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService();
             m_telemetry = new TelemetryWrapper(m_service.Version, VersionHelper.GetVersionFromManifest());
@@ -50,57 +49,65 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             {
                 var deployMenuCommandID = new CommandID(CommandSet, DeployCommandId);
                 var deployMenuItem = new OleMenuCommand(DeployMenuItemCallback, deployMenuCommandID);
-                deployMenuItem.BeforeQueryStatus += HandleMenuItemVisibility;
+                deployMenuItem.BeforeQueryStatus += HandleDeployMenuState;
                 commandService.AddCommand(deployMenuItem);
 
                 var initializeMenuCommandId = new CommandID(CommandSet, InitCommandId);
                 var initMenuItem = new OleMenuCommand(InitMenuItemCallback, initializeMenuCommandId);
-                initMenuItem.BeforeQueryStatus += HandleMenuItemVisibility;
+                initMenuItem.BeforeQueryStatus += HandleInitMenuState;
                 commandService.AddCommand(initMenuItem);
 
                 var singeDeplotMenuCommandId = new CommandID(CommandSet, SingleDeployCommandId);
                 var initSingleDeploy = new OleMenuCommand(SingleDeployMenuItemCallback, singeDeplotMenuCommandId);
-                initSingleDeploy.BeforeQueryStatus += HandleMenuItemVisibility;
+                initSingleDeploy.BeforeQueryStatus += HandleSingleDeployMenuState;
                 commandService.AddCommand(initSingleDeploy);
             }
         }
 
-        private void HandleMenuItemVisibility(object sender, EventArgs e)
+        private void HandleSingleDeployMenuState(object sender, EventArgs e)
         {
             var menu = sender as OleMenuCommand;
-            var isDeploy = menu.CommandID.ID == DeployCommandId;
             var isSingleDeploy = menu.CommandID.ID == SingleDeployCommandId;
-            if (!isDeploy && !isSingleDeploy) return;
+            if (!isSingleDeploy) return;
+
+            var projectName = m_service.GetSelectedProjectName();
+            var objectName = m_service.GetSelectedObjectName();
 
             var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
             var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+            var isDeployEnabled = settingsStore.GetBoolean(SETTINGS_STORE, projectName, false);
+
+            var file = new FileInfo(objectName);
+            menu.Enabled = isDeployEnabled && CrmExtensionsHelper.GetCrmExtensionNumber(objectName) != 99;
+            menu.Text = $"Deploy {file.Name} to CRM";
+        }
+
+        private void HandleInitMenuState(object sender, EventArgs e)
+        {
+            var menu = sender as OleMenuCommand;
+            var isInit = menu.CommandID.ID == InitCommandId;
+            if (!isInit) return;
 
             var projectName = m_service.GetSelectedProjectName();
-            var isDeployEnabled = settingsStore.PropertyExists("CRMToolkit-v2", projectName) 
-                                ? (bool?)settingsStore.GetBoolean("CRMToolkit-v2", projectName, false) 
-                                : null;
+            var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
+            var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+            var isDeployEnabled = settingsStore.GetBoolean(SETTINGS_STORE, projectName, false);
 
-            var menuService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            var initCommand = menuService.FindCommand(new CommandID(CommandSet, InitCommandId));
-            var deployCommand = menuService.FindCommand(new CommandID(CommandSet, DeployCommandId));
+            menu.Enabled = !isDeployEnabled;
+        }
 
-            if (isDeploy && isDeployEnabled.HasValue)
-            {
-                initCommand.Enabled = isDeployEnabled.HasValue ? !isDeployEnabled.Value : true;
-                deployCommand.Enabled = isDeployEnabled.HasValue ? true : false;
-            }
-            else if (isSingleDeploy)
-            {
-                var objectName = m_service.GetSelectedObjectName();
-                var file = new FileInfo(objectName);
-                menu.Enabled = isDeployEnabled.GetValueOrDefault(false) && CrmExtensionsHelper.GetCrmExtensionNumber(objectName) != 99;
-                menu.Text = $"Deploy {file.Name} to CRM";
-            }
-            else
-            {
-                initCommand.Enabled = true;
-                deployCommand.Enabled = false;
-            }
+        private void HandleDeployMenuState(object sender, EventArgs e)
+        {
+            var menu = sender as OleMenuCommand;
+            var isDeploy = menu.CommandID.ID == DeployCommandId;
+            if (!isDeploy) return;
+
+            var projectName = m_service.GetSelectedProjectName();
+            var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
+            var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+            var isDeployEnabled = settingsStore.GetBoolean(SETTINGS_STORE, projectName, false);
+
+            menu.Enabled = isDeployEnabled;
         }
 
         private void DeployMenuItemCallback(object sender, EventArgs e)
@@ -146,8 +153,8 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 m_telemetry.TrackCustomEventWithCustomMetrics("Project Initialization", new MetricData("Project Name", m_service.GetSelectedProjectNameForAnalytics()));
                 var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
                 var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-                if (!settingsStore.CollectionExists("CRMToolkit-v2")) settingsStore.CreateCollection("CRMToolkit-v2");
-                settingsStore.SetBoolean("CRMToolkit-v2", m_service.GetSelectedProjectName(), true);
+                if (!settingsStore.CollectionExists(SETTINGS_STORE)) settingsStore.CreateCollection(SETTINGS_STORE);
+                settingsStore.SetBoolean(SETTINGS_STORE, m_service.GetSelectedProjectName(), true);
             }
             catch (Exception ex)
             {
