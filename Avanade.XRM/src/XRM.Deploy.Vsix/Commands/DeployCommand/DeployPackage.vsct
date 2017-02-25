@@ -18,7 +18,7 @@
         <Parent guid="guidDeployPackageCmdSet" id="MyRoot"/>
         <CommandFlag>IconAndText</CommandFlag>
         <Strings>
-          <ButtonText>CRM Tooltkit</ButtonText>
+          <ButtonText>CRM Tooltkit - WebResource Deploy</ButtonText>
         </Strings>
       </Menu>
     </Menus>

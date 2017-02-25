@@ -2,13 +2,13 @@
 
 namespace XRM.Deploy.Core.Models
 {
-	internal class SolutionDetailModel
-	{
-		public SolutionDetailModel(Guid id)
-		{
-			Id = id;
-		}
+    internal class SolutionDetailModel
+    {
+        public SolutionDetailModel(Guid id)
+        {
+            Id = id;
+        }
 
-		internal Guid Id { get; set; }
-	}
+        public Guid Id { get; set; }
+    }
 }

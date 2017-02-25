@@ -2,14 +2,15 @@
 
 namespace XRM.Deploy.Core.Models
 {
-	internal class SourceControlResultModel
-	{
-		internal SourceControlResultModel()
-		{
-			Continue = true;
-		}
+    internal class SourceControlResultModel
+    {
+        public SourceControlResultModel()
+        {
+            Continue = true;
+        }
 
-		internal bool Continue { get; set; }
-		internal PendingChange[] Changes { get; set; }
-	}
+        public bool Continue { get; set; }
+
+        public PendingChange[] Changes { get; set; }
+    }
 }

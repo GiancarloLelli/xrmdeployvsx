@@ -19,9 +19,9 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
     internal sealed class Deploy
     {
         private Guid m_pane;
-        readonly Package m_package;
-        readonly DteService m_service;
-        readonly TelemetryWrapper m_telemetry;
+        private readonly Package m_package;
+        private readonly DteService m_service;
+        private readonly TelemetryWrapper m_telemetry;
         public const int DeployCommandId = 0x1023;
         public const int InitCommandId = 0x1022;
         public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
@@ -91,6 +91,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var deployConfiguration = XmlObjectsHelper.Deserialize<DeployConfigurationModelFacade>(publishSettigsPath);
                 var orchestrator = new PublishOrchestrator();
                 orchestrator.ReportProgress += LogProgress;
+
                 Async.Task.Factory.StartNew(() =>
                 {
                     orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry);

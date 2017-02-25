@@ -18,13 +18,14 @@ namespace XRM.Deploy.Core
             {
                 WebResourceManager container;
                 Action<string> reportAction = (m) => { ReportProgress?.Invoke(this, m); };
-                var context = new XrmService(deployConfiguration.CRMConnectionString, telemetry, reportAction);
-                var userName = !string.IsNullOrEmpty(deployConfiguration.User) ? deployConfiguration.User : Environment.UserName;
-                var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
-                var sourceControl = new SourceControlManager(workspaceName, userName, reportAction, telemetry);
                 var tfsCollectionUri = new Uri(deployConfiguration.TFSCollectionUrl, UriKind.Absolute);
                 var tfsClientCredentials = CredentialsProvider.GetCredentials(deployConfiguration);
-                var sourceControlResult = sourceControl.InitializeWorkspace(tfsCollectionUri, tfsClientCredentials, deployConfiguration.CheckInEnabled);
+                var context = new XrmService(deployConfiguration.CRMConnectionString, telemetry, reportAction);
+
+                var userName = !string.IsNullOrEmpty(deployConfiguration.User) ? deployConfiguration.User : Environment.UserName;
+                var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
+                var sourceControl = new SourceControlManager(workspaceName, userName, tfsCollectionUri, tfsClientCredentials, reportAction, telemetry);
+                var sourceControlResult = sourceControl.InitializeWorkspace();
 
                 // Must resolve conflicts
                 if (!sourceControlResult.Continue) return;
@@ -37,17 +38,23 @@ namespace XRM.Deploy.Core
                     ReportProgress?.Invoke(this, $"[CRM] => Trovate {container.WebResources.Count} Web Resource.");
                     ReportProgress?.Invoke(this, $"[CRM] => '{deployConfiguration.Prefix}' utilizzato come root.");
                     ReportProgress?.Invoke(this, $"[CRM] => Fetch soluzione '{deployConfiguration.Solution}' da CRM.");
-                    container.EnsureContinue(deployConfiguration.Solution);
+                    container.EnsureContinue(deployConfiguration.Solution, deployConfiguration.Prefix);
 
                     ReportProgress?.Invoke(this, $"[CRM] => Generazione pool OrganizationRequest & scrittura su CRM.");
-                    context.Flush(container.BuildRequestList(deployConfiguration.Solution));
+                    var flushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
                     ReportProgress?.Invoke(this, $"[CRM] => Scrittura su CRM completata.\n");
+
+                    if (flushResult && deployConfiguration.CheckInEnabled)
+                    {
+                        ReportProgress?.Invoke(this, $"[TFS] => Checking in changes.\n");
+                        sourceControl.CheckInChanges();
+                    }
                 }
             }
             catch (Exception exception)
             {
                 ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}\n");
-                if (!(exception is DeployException))
+                if (!(exception is ToolkitException))
                     telemetry.TrackExceptionWithCustomMetrics(exception);
             }
         }

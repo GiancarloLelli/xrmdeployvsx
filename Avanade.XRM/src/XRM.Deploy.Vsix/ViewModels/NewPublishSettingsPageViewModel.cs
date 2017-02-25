@@ -14,16 +14,16 @@ namespace XRM.Deploy.Vsix.ViewModels
 {
     internal class NewPublishSettingsPageViewModel : ViewModelBase
     {
+        private readonly DteService m_service;
+        private readonly TelemetryWrapper m_telemetry;
+
         public RelayCommand<DialogWindow> SaveConfigurationCommand { get; set; }
 
         public DeployConfigurationModelFacade Configuration { get; set; }
 
-        internal string FilePath { get; set; }
+        public string FilePath { get; set; }
 
-        private readonly DteService m_service;
-        private readonly TelemetryWrapper m_telemetry;
-
-        internal NewPublishSettingsPageViewModel(DteService service, TelemetryWrapper telemetry)
+        public NewPublishSettingsPageViewModel(DteService service, TelemetryWrapper telemetry)
         {
             SaveConfigurationCommand = new RelayCommand<DialogWindow>((w) => Save(w));
             Configuration = new DeployConfigurationModelFacade();

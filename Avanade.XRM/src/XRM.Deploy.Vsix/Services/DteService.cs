@@ -10,11 +10,11 @@ namespace XRM.Deploy.Vsix.Services
 {
     public class DteService
     {
-        readonly DTE2 m_environment;
+        private readonly DTE2 m_environment;
 
-        internal string PropertiesDirectory { get; private set; }
+        public string PropertiesDirectory { get; private set; }
 
-        internal string Version
+        public string Version
         {
             get
             {
@@ -22,12 +22,12 @@ namespace XRM.Deploy.Vsix.Services
             }
         }
 
-        internal DteService()
+        public DteService()
         {
             m_environment = Package.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
         }
 
-        internal string GetPublishSettingsFilePathIfExist()
+        public string GetPublishSettingsFilePathIfExist()
         {
             var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
             var selectedProject = selectedProjectBase as Project;
@@ -39,21 +39,21 @@ namespace XRM.Deploy.Vsix.Services
             return File.Exists(publishFilePath) ? publishFilePath : string.Empty;
         }
 
-        internal string GetSelectedProjectName()
+        public string GetSelectedProjectName()
         {
             var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
             var selectedProject = selectedProjectBase as Project;
             return selectedProject?.FileName;
         }
 
-        internal string GetSelectedProjectNameForAnalytics()
+        public string GetSelectedProjectNameForAnalytics()
         {
             var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
             var selectedProject = selectedProjectBase as Project;
             return selectedProject?.Name;
         }
 
-        internal void LogMessage(string e, Guid pane)
+        public void LogMessage(string e, Guid pane)
         {
             IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
             if (outWindow != null)

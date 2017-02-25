@@ -6,7 +6,7 @@ namespace Xrm.Deploy.Vsix.Helpers
 {
     internal class XmlObjectsHelper
     {
-        internal static T Deserialize<T>(string path) where T : class
+        public static T Deserialize<T>(string path) where T : class
         {
             T result = default(T);
             XmlSerializer serializer = new XmlSerializer(typeof(T));
@@ -26,7 +26,7 @@ namespace Xrm.Deploy.Vsix.Helpers
             return result;
         }
 
-        internal static string Serialize<T>(T target) where T : class
+        public static string Serialize<T>(T target) where T : class
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
             using (var stringWriter = new StringWriter())

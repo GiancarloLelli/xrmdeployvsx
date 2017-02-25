@@ -14,11 +14,12 @@ namespace Avanade.XRM.Deployer.Service
 {
     internal class XrmService
     {
-        readonly Lazy<IOrganizationService> m_service;
-        readonly Action<string> m_progress;
-        readonly TelemetryWrapper m_telemetry;
+        private readonly Lazy<IOrganizationService> m_service;
+        private readonly Action<string> m_progress;
+        private readonly TelemetryWrapper m_telemetry;
+        private EntityMetadata m_meta;
 
-        internal XrmService(string connectionString, TelemetryWrapper telemetry, Action<string> report)
+        public XrmService(string connectionString, TelemetryWrapper telemetry, Action<string> report)
         {
             try
             {
@@ -39,7 +40,11 @@ namespace Avanade.XRM.Deployer.Service
                         service = conn.OrganizationWebProxyClient;
                     }
 
-                    if (service == null) throw new NullReferenceException("Unable to instantiate IOrganizationService");
+                    if (service == null)
+                        throw new NullReferenceException("Unable to instantiate IOrganizationService");
+
+                    m_meta = GetMetadata("webresource");
+
                     return service;
                 });
             }
@@ -50,15 +55,15 @@ namespace Avanade.XRM.Deployer.Service
             }
         }
 
-        internal SolutionDetailModel GetSolutionByName(string name)
+        public SolutionDetailModel GetSolutionByName(string name)
         {
             SolutionDetailModel solution = null;
 
             try
             {
-                QueryExpression query = new QueryExpression("solution");
+                var query = new QueryExpression("solution");
                 query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, name);
-                Entity result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
+                var result = m_service.Value.RetrieveMultiple(query).Entities.FirstOrDefault();
                 if (result != null) solution = new SolutionDetailModel(result.Id);
             }
             catch (Exception exception)
@@ -70,20 +75,17 @@ namespace Avanade.XRM.Deployer.Service
             return solution;
         }
 
-        internal Tuple<OrganizationRequest, OrganizationRequest, OrganizationRequest> RequestFactory(string changeType, string resourceName, Entity webResource, string solution)
+        public RequestFactoryResult RequestFactory(string changeType, string resourceName, Entity webResource, string solution)
         {
-            OrganizationRequest requestGeneral = null;
-            OrganizationRequest requestPublish = null;
-            OrganizationRequest requestAddToSolution = null;
+            var requestFactoryResult = new RequestFactoryResult();
 
             try
             {
                 switch (changeType.ToLower())
                 {
                     case "add":
-                        var meta = GetMetadata("webresource");
-                        requestGeneral = OrganizationRequestFactory.CreateFactory(webResource);
-                        requestAddToSolution = OrganizationRequestFactory.AddSolutionFactory(false, 61, meta.MetadataId.Value, solution);
+                        requestFactoryResult.General = OrganizationRequestFactory.CreateFactory(webResource);
+                        requestFactoryResult.AddToSolution = OrganizationRequestFactory.AddSolutionFactory(false, 61, m_meta.MetadataId.Value, solution);
                         break;
                     case "edit":
                     case "delete":
@@ -92,13 +94,13 @@ namespace Avanade.XRM.Deployer.Service
                         {
                             if (changeType.Equals("delete"))
                             {
-                                requestGeneral = OrganizationRequestFactory.DeleteFactory(new EntityReference("webresource", resourceId));
+                                requestFactoryResult.General = OrganizationRequestFactory.DeleteFactory(new EntityReference("webresource", resourceId));
                             }
                             else
                             {
                                 webResource.Id = resourceId;
-                                requestGeneral = OrganizationRequestFactory.UpdateFactory(webResource);
-                                requestPublish = OrganizationRequestFactory.PublishFactory(resourceId.ToString());
+                                requestFactoryResult.General = OrganizationRequestFactory.UpdateFactory(webResource);
+                                requestFactoryResult.Publish = OrganizationRequestFactory.PublishFactory(resourceId.ToString());
                             }
                         }
                         break;
@@ -110,11 +112,13 @@ namespace Avanade.XRM.Deployer.Service
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
-            return new Tuple<OrganizationRequest, OrganizationRequest, OrganizationRequest>(requestGeneral, requestPublish, requestAddToSolution);
+            return requestFactoryResult;
         }
 
-        internal void Flush(IEnumerable<OrganizationRequest> reqs)
+        public bool Flush(IEnumerable<OrganizationRequest> reqs)
         {
+            bool isFaulted = false;
+
             try
             {
                 var chunk = 0;
@@ -126,24 +130,19 @@ namespace Avanade.XRM.Deployer.Service
                     ExecuteMultipleRequest req = new ExecuteMultipleRequest()
                     {
                         Requests = new OrganizationRequestCollection(),
-                        Settings = new ExecuteMultipleSettings()
-                        {
-                            ReturnResponses = true,
-                            ContinueOnError = true
-                        }
+                        Settings = new ExecuteMultipleSettings { ReturnResponses = false, ContinueOnError = false }
                     };
 
                     req.Requests.AddRange(batch);
                     var res = m_service.Value.Execute(req) as ExecuteMultipleResponse;
+                    isFaulted = res.IsFaulted;
 
                     if (res.IsFaulted)
                     {
                         foreach (var results in res.Responses.Where(r => r.Fault != null))
                         {
                             var index = results.RequestIndex;
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"[ERROR] => Index: {index} - Error: {results.Fault.Message}");
-                            Console.ForegroundColor = ConsoleColor.White;
+                            m_progress?.Invoke($"[ERROR] => Index: {index} - Error: {results.Fault.Message}");
                         }
                     }
                 }
@@ -153,6 +152,8 @@ namespace Avanade.XRM.Deployer.Service
                 m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
+
+            return isFaulted;
         }
 
         private EntityMetadata GetMetadata(string logicalName)
@@ -161,12 +162,8 @@ namespace Avanade.XRM.Deployer.Service
 
             try
             {
-                RetrieveEntityRequest request = new RetrieveEntityRequest()
-                {
-                    LogicalName = logicalName
-                };
-
-                var resp = (RetrieveEntityResponse)m_service.Value.Execute(request);
+                var request = new RetrieveEntityRequest { LogicalName = logicalName };
+                var resp = m_service.Value.Execute(request) as RetrieveEntityResponse;
                 meta = resp.EntityMetadata;
             }
             catch (Exception exception)
@@ -184,7 +181,7 @@ namespace Avanade.XRM.Deployer.Service
 
             try
             {
-                QueryExpression query = new QueryExpression("webresource");
+                var query = new QueryExpression("webresource");
                 query.TopCount = 1;
 
                 var filter = query.Criteria.AddFilter(LogicalOperator.Or);
