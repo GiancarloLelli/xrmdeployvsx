@@ -62,8 +62,6 @@ namespace XRM.Deploy.Core.Managers
                     throw new ToolkitException($"No solution found in CRM with unique name: '{solution}'");
                 }
             };
-
-            // TODO: Check if root exist, if not create it
         }
 
         public List<OrganizationRequest> BuildRequestList(string solution)

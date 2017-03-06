@@ -58,14 +58,14 @@ namespace XRM.Deploy.Core
 
                 if (container.WebResources.Count > 0)
                 {
-                    ReportProgress?.Invoke(this, $"[CRM] => Trovate {container.WebResources.Count} Web Resource.");
-                    ReportProgress?.Invoke(this, $"[CRM] => '{deployConfiguration.Prefix}' utilizzato come root.");
-                    ReportProgress?.Invoke(this, $"[CRM] => Fetch soluzione '{deployConfiguration.Solution}' da CRM.");
+                    ReportProgress?.Invoke(this, $"[CRM] => Found {container.WebResources.Count} Web Resource.");
+                    ReportProgress?.Invoke(this, $"[CRM] => '{deployConfiguration.Prefix}' used as base path.");
+                    ReportProgress?.Invoke(this, $"[CRM] => Fetching '{deployConfiguration.Solution}' solution from CRM.");
                     container.EnsureContinue(deployConfiguration.Solution, deployConfiguration.Prefix);
 
-                    ReportProgress?.Invoke(this, $"[CRM] => Generazione pool OrganizationRequest & scrittura su CRM.");
+                    ReportProgress?.Invoke(this, $"[CRM] => Writing changes to the CRM.");
                     var faultedFlushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
-                    ReportProgress?.Invoke(this, $"[CRM] => Scrittura su CRM completata.\n");
+                    ReportProgress?.Invoke(this, $"[CRM] => Writing completed.\n");
 
                     if (!faultedFlushResult && deployConfiguration.CheckInEnabled)
                     {

@@ -37,14 +37,14 @@ namespace XRM.Deploy.Core.Managers
                 using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(m_tfs, m_creds))
                 {
                     m_progress?.Invoke("------------------- START -----------------------");
-                    m_progress?.Invoke($"[TFS] => Enumerazione cambiamenti sul Workspace.");
+                    m_progress?.Invoke($"[TFS] => Detecting changes in the workspace.");
                     VersionControlServer versionControl = collection.GetService(typeof(VersionControlServer)) as VersionControlServer;
                     Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
 
                     result.Changes = workspace.GetPendingChanges();
                     m_result = result;
 
-                    m_progress?.Invoke($"[TFS] => Trovate {result.Changes.Length} Check-Out items.");
+                    m_progress?.Invoke($"[TFS] => Found {result.Changes.Length} Check-Out items.");
 
                     var folderFilters = result.Changes.Select(c => c.LocalOrServerFolder).Distinct().ToArray();
                     if (folderFilters.Length > 0)
@@ -52,7 +52,7 @@ namespace XRM.Deploy.Core.Managers
                         var conflicts = workspace.QueryConflicts(folderFilters, true);
                         if (conflicts.Length > 0)
                         {
-                            m_progress?.Invoke($"[TFS] => Rilevati {conflicts.Length} conflitti. Aggiorna il workspace prima di continuare");
+                            m_progress?.Invoke($"[TFS] => Found {conflicts.Length} conflicts. Update your workspace to continue.");
                             result.Continue = false;
                         }
                     }
@@ -81,7 +81,7 @@ namespace XRM.Deploy.Core.Managers
                         if (m_result.Changes.Length > 0)
                         {
                             workspace.CheckIn(m_result.Changes, $"CI Checkin by {Environment.UserName}");
-                            m_progress?.Invoke($"[TFS] => Check-In effettuato on behalf of {Environment.UserName}.");
+                            m_progress?.Invoke($"[TFS] => Check-In made on behalf of {Environment.UserName}.");
                         }
                     }
                 }

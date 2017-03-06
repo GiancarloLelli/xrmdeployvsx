@@ -42,7 +42,7 @@ namespace XRM.Deploy.Vsix.ViewModels
 
                 if (!validation)
                 {
-                    results.ForEach((error) => m_service.LogMessage($"[ERR] => {error.ErrorMessage}", panelGuid));
+                    results.ForEach((error) => m_service.LogMessage($"[EXCEPTION] => {error.ErrorMessage}", panelGuid));
                     return;
                 }
 
