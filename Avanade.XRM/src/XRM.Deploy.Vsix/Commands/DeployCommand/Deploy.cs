@@ -1,9 +1,6 @@
-﻿using Microsoft.VisualStudio.Settings;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Settings;
+﻿using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.IO;
 using Xrm.Deploy.Vsix.Helpers;
 using XRM.Deploy.Core;
@@ -41,7 +38,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         {
             m_package = package ?? throw new ArgumentNullException(nameof(package));
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
-            m_service = new DteService();
+            m_service = new DteService(ServiceProvider);
             m_telemetry = new TelemetryWrapper(m_service.Version, VersionHelper.GetVersionFromManifest());
 
             var commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -72,10 +69,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
             var projectName = m_service.GetSelectedProjectName();
             var objectName = m_service.GetSelectedObjectName();
-
-            var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
-            var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-            var isDeployEnabled = settingsStore.GetBoolean(SETTINGS_STORE, projectName, false);
+            var isDeployEnabled = m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, projectName, false);
 
             var file = new FileInfo(objectName);
             menu.Enabled = isDeployEnabled && CrmExtensionsHelper.GetCrmExtensionNumber(objectName) != 99;
@@ -89,9 +83,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             if (!isInit) return;
 
             var projectName = m_service.GetSelectedProjectName();
-            var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
-            var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-            var isDeployEnabled = settingsStore.GetBoolean(SETTINGS_STORE, projectName, false);
+            var isDeployEnabled = m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, projectName, false);
 
             menu.Enabled = !isDeployEnabled;
         }
@@ -103,9 +95,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             if (!isDeploy) return;
 
             var projectName = m_service.GetSelectedProjectName();
-            var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
-            var settingsStore = shellSettingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-            var isDeployEnabled = settingsStore.GetBoolean(SETTINGS_STORE, projectName, false);
+            var isDeployEnabled = m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, projectName, false);
 
             menu.Enabled = isDeployEnabled;
         }
@@ -117,8 +107,17 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var singleResourceName = e is SingleResourceEventArgs ? (e as SingleResourceEventArgs).File : null;
                 var projectName = m_service.GetSelectedProjectNameForAnalytics();
                 m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
-
                 var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
+
+                // Delete settings after breaking update
+                var settingsKey = "IsConfigDeleted-2.1";
+                if (!m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, settingsKey, false) && !string.IsNullOrEmpty(publishSettigsPath))
+                {
+                    File.Delete(publishSettigsPath);
+                    publishSettigsPath = string.Empty;
+                    m_service.WritableSettings.SetBoolean(SETTINGS_STORE, settingsKey, true);
+                }
+
                 if (string.IsNullOrEmpty(publishSettigsPath))
                 {
                     var dialog = new NewPublishSettingsPage(m_service, m_telemetry);
@@ -151,10 +150,8 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             try
             {
                 m_telemetry.TrackCustomEventWithCustomMetrics("Project Initialization", new MetricData("Project Name", m_service.GetSelectedProjectNameForAnalytics()));
-                var shellSettingsManager = new ShellSettingsManager(ServiceProvider);
-                var settingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-                if (!settingsStore.CollectionExists(SETTINGS_STORE)) settingsStore.CreateCollection(SETTINGS_STORE);
-                settingsStore.SetBoolean(SETTINGS_STORE, m_service.GetSelectedProjectName(), true);
+                if (!m_service.WritableSettings.CollectionExists(SETTINGS_STORE)) m_service.WritableSettings.CreateCollection(SETTINGS_STORE);
+                m_service.WritableSettings.SetBoolean(SETTINGS_STORE, m_service.GetSelectedProjectName(), true);
             }
             catch (Exception ex)
             {

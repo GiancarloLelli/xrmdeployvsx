@@ -4,8 +4,10 @@ using Microsoft.VisualStudio.PlatformUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using Xrm.Deploy.Vsix.Helpers;
+using XRM.Deploy.Vsix.Extensions;
 using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;
 using XRM.Telemetry;
@@ -19,6 +21,8 @@ namespace XRM.Deploy.Vsix.ViewModels
 
         public RelayCommand<DialogWindow> SaveConfigurationCommand { get; set; }
 
+        public RelayCommand NavigateToPatGuide { get; set; }
+
         public DeployConfigurationModelFacade Configuration { get; set; }
 
         public string FilePath { get; set; }
@@ -26,10 +30,13 @@ namespace XRM.Deploy.Vsix.ViewModels
         public NewPublishSettingsPageViewModel(DteService service, TelemetryWrapper telemetry)
         {
             SaveConfigurationCommand = new RelayCommand<DialogWindow>((w) => Save(w));
+            NavigateToPatGuide = new RelayCommand(() => NavigateToUrl());
             Configuration = new DeployConfigurationModelFacade();
             m_service = service;
             m_telemetry = telemetry;
         }
+
+        private void NavigateToUrl() => Process.Start("https://www.visualstudio.com/en-us/docs/setup-admin/team-services/use-personal-access-tokens-to-authenticate");
 
         private void Save(DialogWindow window)
         {
@@ -37,12 +44,14 @@ namespace XRM.Deploy.Vsix.ViewModels
 
             try
             {
+                string customError = string.Empty;
                 List<ValidationResult> results = new List<ValidationResult>();
                 var validation = Validator.TryValidateObject(Configuration, new ValidationContext(Configuration), results);
 
-                if (!validation)
+                if (!validation || !Configuration.AreCustomFieldsValid(out customError))
                 {
                     results.ForEach((error) => m_service.LogMessage($"[EXCEPTION] => {error.ErrorMessage}", panelGuid));
+                    m_service.LogMessage($"[EXCEPTION] => {customError}", panelGuid);
                     return;
                 }
 

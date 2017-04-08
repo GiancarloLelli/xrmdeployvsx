@@ -1,24 +1,24 @@
-﻿namespace Xrm.Deploy.Core.Models
+﻿using XRM.Sdk.Dynamics.Models;
+
+namespace XRM.Deploy.Core.Models
 {
     public class DeployConfigurationModel
     {
-        public string TFSCollectionUrl { get; set; }
+        public DeployConfigurationModel()
+        {
+            SourceControlSettings = new SourceControlConnectionSettings();
+            CrmSettings = new CrmConnectionSettings();
+        }
 
-        public string Domain { get; set; }
+        public CrmConnectionSettings CrmSettings { get; set; }
 
-        public string User { get; set; }
-
-        public string Password { get; set; }
+        public SourceControlConnectionSettings SourceControlSettings { get; set; }
 
         public string Solution { get; set; }
 
         public string Prefix { get; set; }
 
-        public string CRMConnectionString { get; set; }
-
         public string Workspace { get; set; }
-
-        public string ConfigurationName { get; set; }
 
         public bool CheckInEnabled { get; set; }
 
@@ -26,9 +26,9 @@
         {
             get
             {
-                return !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password);
+                return (!string.IsNullOrEmpty(SourceControlSettings.User) && !string.IsNullOrEmpty(SourceControlSettings.Password)) ||
+                        !string.IsNullOrEmpty(SourceControlSettings.Pat);
             }
         }
-
     }
 }

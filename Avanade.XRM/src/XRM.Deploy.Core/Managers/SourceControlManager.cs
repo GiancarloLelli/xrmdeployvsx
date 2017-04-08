@@ -1,5 +1,6 @@
 ﻿using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
+using Microsoft.VisualStudio.Services.Common;
 using System;
 using System.Linq;
 using XRM.Deploy.Core.Models;
@@ -14,10 +15,10 @@ namespace XRM.Deploy.Core.Managers
         private readonly Action<string> m_progress;
         private readonly TelemetryWrapper m_telemetry;
         private readonly Uri m_tfs;
-        private readonly TfsClientCredentials m_creds;
+        private readonly VssCredentials m_creds;
         private SourceControlResultModel m_result;
 
-        public SourceControlManager(string workspace, string user, Uri tfs, TfsClientCredentials creds, Action<string> reportProgress, TelemetryWrapper telemetry)
+        public SourceControlManager(string workspace, string user, Uri tfs, VssCredentials creds, Action<string> reportProgress, TelemetryWrapper telemetry)
         {
             m_workspace = workspace;
             m_user = user;
@@ -36,9 +37,10 @@ namespace XRM.Deploy.Core.Managers
             {
                 using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(m_tfs, m_creds))
                 {
+                    collection.EnsureAuthenticated();
                     m_progress?.Invoke("------------------- START -----------------------");
                     m_progress?.Invoke($"[TFS] => Detecting changes in the workspace.");
-                    VersionControlServer versionControl = collection.GetService(typeof(VersionControlServer)) as VersionControlServer;
+                    VersionControlServer versionControl = collection.GetService<VersionControlServer>();
                     Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
 
                     result.Changes = workspace.GetPendingChanges();
@@ -62,6 +64,7 @@ namespace XRM.Deploy.Core.Managers
             {
                 m_progress?.Invoke($"[EXCEPTION] => {ex.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(ex);
+                result.Continue = false;
             }
 
             return result;

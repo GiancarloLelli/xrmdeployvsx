@@ -1,7 +1,9 @@
 ﻿using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell.Settings;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,6 +13,7 @@ namespace XRM.Deploy.Vsix.Services
     public class DteService
     {
         private readonly DTE2 m_environment;
+        private readonly IServiceProvider m_provider;
 
         public string PropertiesDirectory { get; private set; }
 
@@ -22,9 +25,42 @@ namespace XRM.Deploy.Vsix.Services
             }
         }
 
-        public DteService()
+        public SettingsStore ReadOnlySettings
+        {
+            get
+            {
+                SettingsStore store = null;
+
+                if (store == null)
+                {
+                    var settingsManager = new ShellSettingsManager(m_provider);
+                    store = settingsManager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                }
+
+                return store;
+            }
+        }
+
+        public WritableSettingsStore WritableSettings
+        {
+            get
+            {
+                WritableSettingsStore store = null;
+
+                if (store == null)
+                {
+                    var settingsManager = new ShellSettingsManager(m_provider);
+                    store = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+                }
+
+                return store;
+            }
+        }
+
+        public DteService(IServiceProvider provider)
         {
             m_environment = Package.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+            m_provider = provider;
         }
 
         public string GetPublishSettingsFilePathIfExist()

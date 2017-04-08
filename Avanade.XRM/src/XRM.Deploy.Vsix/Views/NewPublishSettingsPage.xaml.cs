@@ -28,5 +28,11 @@ namespace XRM.Deploy.Vsix.Views
             var pbox = sender as PasswordBox;
             (DataContext as NewPublishSettingsPageViewModel).Configuration.Password = pbox?.Password;
         }
+
+        private void CrmPasswordChanged(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var pbox = sender as PasswordBox;
+            (DataContext as NewPublishSettingsPageViewModel).Configuration.CrmPassword = pbox?.Password;
+        }
     }
 }

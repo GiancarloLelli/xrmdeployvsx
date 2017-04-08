@@ -2,9 +2,9 @@
 using Microsoft.TeamFoundation.VersionControl.Client;
 using System;
 using System.Linq;
-using Xrm.Deploy.Core.Models;
 using XRM.Deploy.Core.Fallback;
 using XRM.Deploy.Core.Managers;
+using XRM.Deploy.Core.Models;
 using XRM.Deploy.Core.Providers;
 using XRM.Telemetry;
 using XRM.Telemetry.Models;
@@ -20,11 +20,11 @@ namespace XRM.Deploy.Core
             try
             {
                 Action<string> reportAction = (m) => { ReportProgress?.Invoke(this, m); };
-                var tfsCollectionUri = new Uri(deployConfiguration.TFSCollectionUrl, UriKind.Absolute);
+                var tfsCollectionUri = new Uri(deployConfiguration.SourceControlSettings.TFSCollectionUrl, UriKind.Absolute);
                 var tfsClientCredentials = CredentialsProvider.GetCredentials(deployConfiguration);
-                var context = new XrmService(deployConfiguration.CRMConnectionString, deployConfiguration.Solution, telemetry, reportAction);
+                var context = new XrmService(deployConfiguration.CrmSettings, deployConfiguration.Solution, telemetry, reportAction);
 
-                var userName = !string.IsNullOrEmpty(deployConfiguration.User) ? deployConfiguration.User : Environment.UserName;
+                var userName = !string.IsNullOrEmpty(deployConfiguration.SourceControlSettings.User) ? deployConfiguration.SourceControlSettings.User : Environment.UserName;
                 var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
                 var sourceControl = new SourceControlManager(workspaceName, userName, tfsCollectionUri, tfsClientCredentials, reportAction, telemetry);
                 var sourceControlResult = sourceControl.InitializeWorkspace();

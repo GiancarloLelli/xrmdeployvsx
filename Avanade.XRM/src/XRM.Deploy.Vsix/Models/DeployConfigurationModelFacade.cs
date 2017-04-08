@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
-using Xrm.Deploy.Core.Models;
+using XRM.Deploy.Core.Models;
 
 namespace XRM.Deploy.Vsix.Models
 {
@@ -26,36 +26,156 @@ namespace XRM.Deploy.Vsix.Models
             m_model = new DeployConfigurationModel();
         }
 
-        [Required, DataType(DataType.Url)]
-        public string TfsProjectCollectionUri
-        {
-            get { return m_model.TFSCollectionUrl; }
-            set
-            {
-                m_model.TFSCollectionUrl = value;
-                RaisePropertyChanged(() => TfsProjectCollectionUri);
-            }
-        }
-
+        #region CRM Connection Settings
         [Required]
         public string ConnectionString
         {
-            get { return m_model.CRMConnectionString; }
+            get { return m_model.CrmSettings.Discovery; }
             set
             {
-                m_model.CRMConnectionString = value;
+                m_model.CrmSettings.Discovery = value;
                 RaisePropertyChanged(() => ConnectionString);
             }
         }
 
         [Required]
-        public string Solution
+        public string CrmUsername
         {
-            get { return m_model.Solution; }
+            get { return m_model.CrmSettings.Username; }
             set
             {
-                m_model.Solution = value;
-                RaisePropertyChanged(() => Solution);
+                m_model.CrmSettings.Username = value;
+                RaisePropertyChanged(() => CrmUsername);
+            }
+        }
+
+        [Required]
+        public string CrmPassword
+        {
+            get { return m_model.CrmSettings.Password; }
+            set
+            {
+                m_model.CrmSettings.Password = value;
+                RaisePropertyChanged(() => CrmPassword);
+            }
+        }
+
+        [Required]
+        public string CrmDomain
+        {
+            get { return m_model.CrmSettings.Domain; }
+            set
+            {
+                m_model.CrmSettings.Domain = value;
+                RaisePropertyChanged(() => CrmDomain);
+            }
+        }
+
+        [Required]
+        public string CrmOrganization
+        {
+            get { return m_model.CrmSettings.OrganizationName; }
+            set
+            {
+                m_model.CrmSettings.OrganizationName = value;
+                RaisePropertyChanged(() => CrmOrganization);
+            }
+        }
+        #endregion
+
+        #region Source Control Settings
+        [Required, DataType(DataType.Url)]
+        public string TfsProjectCollectionUri
+        {
+            get { return m_model.SourceControlSettings.TFSCollectionUrl; }
+            set
+            {
+                m_model.SourceControlSettings.TFSCollectionUrl = value;
+                RaisePropertyChanged(() => TfsProjectCollectionUri);
+            }
+        }
+
+        public string Workspace
+        {
+            get { return m_model.Workspace; }
+            set
+            {
+                m_model.Workspace = value;
+                RaisePropertyChanged(() => Workspace);
+            }
+        }
+
+        public bool IsOnPrem
+        {
+            get { return m_model.SourceControlSettings.IsOnPrem; }
+            set
+            {
+                m_model.SourceControlSettings.IsOnPrem = value;
+                RaisePropertyChanged(() => IsOnPrem);
+                CleanOnlineData();
+            }
+        }
+
+        public bool IsOnline
+        {
+            get { return m_model.SourceControlSettings.IsOnline; }
+            set
+            {
+                m_model.SourceControlSettings.IsOnline = value;
+                RaisePropertyChanged(() => IsOnline);
+                CleanOnPremData();
+            }
+        }
+
+        public string Domain
+        {
+            get { return m_model.SourceControlSettings.Domain; }
+            set
+            {
+                m_model.SourceControlSettings.Domain = value;
+                RaisePropertyChanged(() => Domain);
+            }
+        }
+
+        public string User
+        {
+            get { return m_model.SourceControlSettings.User; }
+            set
+            {
+                m_model.SourceControlSettings.User = value;
+                RaisePropertyChanged(() => User);
+            }
+        }
+
+        public string Password
+        {
+            get { return m_model.SourceControlSettings.Password; }
+            set
+            {
+                m_model.SourceControlSettings.Password = value;
+                RaisePropertyChanged(() => Password);
+            }
+        }
+
+        public string Pat
+        {
+            get { return m_model.SourceControlSettings.Pat; }
+            set
+            {
+                m_model.SourceControlSettings.Pat = value;
+                RaisePropertyChanged(() => Pat);
+            }
+        }
+        #endregion
+
+        #region General deploy settings
+        public bool CheckInEnabled
+        {
+            get { return m_model.CheckInEnabled; }
+            set
+            {
+                m_model.CheckInEnabled = value;
+                RaisePropertyChanged(() => CheckInEnabled);
             }
         }
 
@@ -70,54 +190,27 @@ namespace XRM.Deploy.Vsix.Models
             }
         }
 
-        public string Domain
+        [Required]
+        public string Solution
         {
-            get { return m_model.Domain; }
+            get { return m_model.Solution; }
             set
             {
-                m_model.Domain = value;
-                RaisePropertyChanged(() => Domain);
+                m_model.Solution = value;
+                RaisePropertyChanged(() => Solution);
             }
         }
+        #endregion
 
-        public string User
+        private void CleanOnPremData()
         {
-            get { return m_model.User; }
-            set
-            {
-                m_model.User = value;
-                RaisePropertyChanged(() => User);
-            }
+            Password = string.Empty;
+            Domain = string.Empty;
         }
 
-        public string Password
+        private void CleanOnlineData()
         {
-            get { return m_model.Password; }
-            set
-            {
-                m_model.Password = value;
-                RaisePropertyChanged(() => Password);
-            }
-        }
-
-        public string Workspace
-        {
-            get { return m_model.Workspace; }
-            set
-            {
-                m_model.Workspace = value;
-                RaisePropertyChanged(() => Workspace);
-            }
-        }
-
-        public bool CheckInEnabled
-        {
-            get { return m_model.CheckInEnabled; }
-            set
-            {
-                m_model.CheckInEnabled = value;
-                RaisePropertyChanged(() => CheckInEnabled);
-            }
+            Pat = string.Empty;
         }
     }
 }

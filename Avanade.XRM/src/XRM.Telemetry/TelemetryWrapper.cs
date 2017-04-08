@@ -34,8 +34,13 @@ namespace XRM.Telemetry
             metrics.Add("Username", Environment.UserName);
             metrics.Add("Machine Name", Environment.MachineName);
             metrics.Add("OS", Environment.OSVersion.ToString());
-            metrics.Add("Visual Studio Version", client.VisualStudioVersion);
-            metrics.Add("Toolkit Version", client.VsxVersion);
+
+            if (client != null)
+            {
+                metrics.Add("Visual Studio Version", client.VisualStudioVersion);
+                metrics.Add("Toolkit Version", client.VsxVersion);
+            }
+
             client.Instance.TrackException(ex, metrics);
         }
 
@@ -47,8 +52,13 @@ namespace XRM.Telemetry
             eventData.Properties.Add("Username", Environment.UserName);
             eventData.Properties.Add("Machine Name", Environment.MachineName);
             eventData.Properties.Add("OS", Environment.OSVersion.ToString());
-            eventData.Properties.Add("Visual Studio Version", client.VisualStudioVersion);
-            eventData.Properties.Add("Toolkit Version", client.VsxVersion);
+
+            if (client != null)
+            {
+                eventData.Properties.Add("Visual Studio Version", client.VisualStudioVersion);
+                eventData.Properties.Add("Toolkit Version", client.VsxVersion);
+            }
+
             client.Instance.TrackEvent(eventData);
         }
     }

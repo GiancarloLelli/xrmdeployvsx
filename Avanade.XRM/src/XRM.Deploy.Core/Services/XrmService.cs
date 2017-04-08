@@ -2,12 +2,13 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using XRM.Deploy.Core.Factories;
 using XRM.Deploy.Core.Models;
+using XRM.Sdk.Dynamics;
+using XRM.Sdk.Dynamics.Models;
 using XRM.Telemetry;
 
 namespace Avanade.XRM.Deployer.Service
@@ -19,7 +20,7 @@ namespace Avanade.XRM.Deployer.Service
         private readonly TelemetryWrapper m_telemetry;
         private readonly string m_solution;
 
-        public XrmService(string connectionString, string solution, TelemetryWrapper telemetry, Action<string> report)
+        public XrmService(CrmConnectionSettings connectionSettings, string solution, TelemetryWrapper telemetry, Action<string> report)
         {
             try
             {
@@ -29,18 +30,8 @@ namespace Avanade.XRM.Deployer.Service
 
                 m_service = new Lazy<IOrganizationService>(() =>
                 {
-                    var conn = new CrmServiceClient(connectionString);
-                    IOrganizationService service = null;
-
-                    if (conn.OrganizationServiceProxy != null)
-                    {
-                        conn.OrganizationServiceProxy.Timeout = TimeSpan.FromMinutes(5);
-                        service = conn.OrganizationServiceProxy;
-                    }
-                    else if (conn.OrganizationWebProxyClient != null)
-                    {
-                        service = conn.OrganizationWebProxyClient;
-                    }
+                    var crmServiceClient = new CrmServiceClient(connectionSettings);
+                    IOrganizationService service = crmServiceClient.OrganizationServiceFactory();
 
                     if (service == null)
                         throw new NullReferenceException("Unable to instantiate IOrganizationService");
