@@ -65,11 +65,11 @@ namespace XRM.Deploy.Core
 
                     ReportProgress?.Invoke(this, $"[CRM] => Writing changes to the CRM.");
                     var faultedFlushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
-                    ReportProgress?.Invoke(this, $"[CRM] => Writing completed.\n");
+                    ReportProgress?.Invoke(this, $"[CRM] => Writing completed.");
 
                     if (!faultedFlushResult && deployConfiguration.CheckInEnabled)
                     {
-                        ReportProgress?.Invoke(this, $"[TFS] => Checking in changes.\n");
+                        ReportProgress?.Invoke(this, $"[TFS] => Checking in changes.");
                         sourceControl.CheckInChanges();
                     }
                 }

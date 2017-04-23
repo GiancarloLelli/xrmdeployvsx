@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
+using System.Windows;
 using System.Windows.Controls;
 using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
@@ -21,18 +22,23 @@ namespace XRM.Deploy.Vsix.Views
             DataContext = new NewPublishSettingsPageViewModel(dteService, telemetry);
         }
 
-        private void CancelPublish(object sender, System.Windows.RoutedEventArgs e) => Close();
+        private void CancelPublish(object sender, RoutedEventArgs e) => Close();
 
-        private void PasswordChanged(object sender, System.Windows.RoutedEventArgs e)
+        private void PasswordChanged(object sender, RoutedEventArgs e)
         {
             var pbox = sender as PasswordBox;
             (DataContext as NewPublishSettingsPageViewModel).Configuration.Password = pbox?.Password;
         }
 
-        private void CrmPasswordChanged(object sender, System.Windows.RoutedEventArgs e)
+        private void CrmPasswordChanged(object sender, RoutedEventArgs e)
         {
             var pbox = sender as PasswordBox;
             (DataContext as NewPublishSettingsPageViewModel).Configuration.CrmPassword = pbox?.Password;
+        }
+
+        private void ClickForNavigationOnPatHowTo(object sender, RoutedEventArgs e)
+        {
+            (DataContext as NewPublishSettingsPageViewModel)?.NavigateToPatGuide.Execute(null);
         }
     }
 }

@@ -21,15 +21,19 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,10,0,0" Grid.Column="0">
-                            <Grid Height="20" Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="CRM Discovery URL*" VerticalAlignment="Center" />
-                                <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.ConnectionString, Mode=TwoWay}"/>
-                            </Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid Height="20" Margin="5,0,6,0" Grid.Row="0" Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="CRM Discovery URL*" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.ConnectionString, Mode=TwoWay}"/>
+                        </Grid>
+                        <StackPanel Grid.Column="0" Grid.Row="1">
                             <Grid Height="20" Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="120" />
@@ -63,7 +67,7 @@
                                 <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.CrmDomain, Mode=TwoWay}"/>
                             </Grid>
                         </StackPanel>
-                        <StackPanel Margin="0,10,0,0" Grid.Column="1">
+                        <StackPanel Grid.Column="1" Grid.Row="1">
                             <Grid Height="20" Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="120" />
@@ -168,20 +172,21 @@
                     </StackPanel>
                 </GroupBox.Content>
             </GroupBox>
-            <RichTextBox Margin="5,0,5,5" HorizontalAlignment="Left" FontSize="9" Background="Transparent" BorderThickness="0">
+            <RichTextBox Margin="5,0,5,5" HorizontalAlignment="Left" FontSize="9" Background="Transparent" BorderThickness="0"
+                         IsReadOnly="True" IsDocumentEnabled="True">
                 <RichTextBox.Resources>
                     <Style TargetType="{x:Type Paragraph}">
                         <Setter Property="Margin" Value="0" />
                     </Style>
                 </RichTextBox.Resources>
-                <FlowDocument>
-                    <Paragraph>(*) Indicates a mandatory field.</Paragraph>
-                    <Paragraph>(**) Optional fields, whenever different from Windows' defaults, must be specified.</Paragraph>
+                <FlowDocument Cursor="Arrow">
+                    <Paragraph>(*) Indicates a mandatory field</Paragraph>
+                    <Paragraph>(**) Optional fields, whenever different from Windows' defaults, must be specified</Paragraph>
                     <Paragraph>
                         <Run Text="(***) You can get a Personal Access Token for VSTS Online following" />
-                        <Hyperlink Command="{Binding NavigateToPatGuide}">
+                        <Hyperlink Cursor="Hand" Click="ClickForNavigationOnPatHowTo">
                             <Hyperlink.Inlines>
-                                <Run Foreground="Blue" Text="this link." />
+                                <Run Foreground="Blue" Text="this link" />
                             </Hyperlink.Inlines>
                         </Hyperlink>
                     </Paragraph>

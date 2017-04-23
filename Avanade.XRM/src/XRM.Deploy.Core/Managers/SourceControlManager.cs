@@ -83,8 +83,8 @@ namespace XRM.Deploy.Core.Managers
 
                         if (m_result.Changes.Length > 0)
                         {
-                            workspace.CheckIn(m_result.Changes, $"CI Checkin by {Environment.UserName}");
-                            m_progress?.Invoke($"[TFS] => Check-In made on behalf of {Environment.UserName}.");
+                            workspace.CheckIn(m_result.Changes, $"CI Checkin by {m_user}");
+                            m_progress?.Invoke($"[TFS] => Check-In made on behalf of {m_user}.");
                         }
                     }
                 }
