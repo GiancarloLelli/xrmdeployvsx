@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="ITDC-AVACRMTLK" Version="2.0.1" Language="en-US" Publisher="Giancarlo Lelli" />
+    <Identity Id="ITDC-AVACRMTLK" Version="2.1.0" Language="en-US" Publisher="Giancarlo Lelli" />
     <DisplayName>Avanade CRM Toolkit</DisplayName>
     <Description xml:space="preserve">Avanade CRM Toolkit. Use this product to deploy directly from Visual Studio any frontend customization for Microsoft Dynamics CRM.</Description>
     <License>license.txt</License>
