@@ -21,7 +21,7 @@
         <Parent guid="guidDeployPackageCmdSet" id="MyRoot"/>
         <CommandFlag>IconAndText</CommandFlag>
         <Strings>
-          <ButtonText>CRM Tooltkit - Web Resource Manager</ButtonText>
+          <ButtonText>Web Resource Publisher</ButtonText>
         </Strings>
       </Menu>
     </Menus>
@@ -39,7 +39,7 @@
         <Parent guid="guidDeployPackageCmdSet" id="MySubMenuGroup" />
         <CommandFlag>TextOnly</CommandFlag>
         <Strings>
-          <ButtonText>Deploy Changes to CRM</ButtonText>
+          <ButtonText>Deploy changes to Dynamics 365</ButtonText>
         </Strings>
       </Button>
       
@@ -48,7 +48,7 @@
         <Parent guid="guidDeployPackageCmdSet" id="MyProjectRoot" />
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Deploy to CRM</ButtonText>
+          <ButtonText>Deploy to Dynamics 365</ButtonText>
         </Strings>
       </Button>
     </Buttons>

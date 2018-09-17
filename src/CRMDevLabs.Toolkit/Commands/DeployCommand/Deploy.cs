@@ -1,8 +1,12 @@
 ﻿using CRMDevLabs.Toolkit.Common.Serialization;
 using CRMDevLabs.Toolkit.Common.Telemetry;
+using CRMDevLabs.Toolkit.Feature.WebResource;
 using CRMDevLabs.Toolkit.Models.Package;
 using CRMDevLabs.Toolkit.Models.Telemetry;
+using CRMDevLabs.Toolkit.Presentation.Models;
+using CRMDevLabs.Toolkit.Presentation.ViewModels;
 using CRMDevLabs.Toolkit.Presentation.Views;
+using CRMDevLabs.Toolkit.Services;
 using CRMDevLabs.Toolkit.Telemetry;
 using CRMDevLabs.Toolkit.Xrm.Artifacts;
 using Microsoft.VisualStudio.Shell;
@@ -11,20 +15,16 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using XRM.Deploy.Core;
-using XRM.Deploy.Vsix.Models;
-using XRM.Deploy.Vsix.Services;
-using XRM.Deploy.Vsix.ViewModels;
 using Async = System.Threading.Tasks;
 
-namespace XRM.Deploy.Vsix.Commands.DeployCommand
+namespace CRMDevLabs.Toolkit.Commands.DeployCommand
 {
     internal sealed class Deploy
     {
         private Guid m_pane;
         private CancellationToken m_token;
 
-        private readonly Package m_package;
+        private readonly AsyncPackage m_package;
         private readonly DteService m_service;
         private readonly TelemetryWrapper m_telemetry;
         public const int InitCommandId = 0x1023;
@@ -37,9 +37,13 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
         private IServiceProvider ServiceProvider { get { return m_package; } }
 
-        public static void Initialize(Package package) => Instance = new Deploy(package);
+        public static async Async.Task InitializeAsync(AsyncPackage package)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+            Instance = new Deploy(package);
+        }
 
-        private Deploy(Package package)
+        private Deploy(AsyncPackage package)
         {
             m_token = new CancellationToken();
             m_package = package ?? throw new ArgumentNullException(nameof(package));

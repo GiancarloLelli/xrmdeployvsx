@@ -8,7 +8,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace XRM.Deploy.Vsix.Services
+namespace CRMDevLabs.Toolkit.Services
 {
     public class DteService
     {

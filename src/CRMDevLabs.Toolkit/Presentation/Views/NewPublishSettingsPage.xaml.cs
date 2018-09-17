@@ -1,8 +1,8 @@
-﻿using CRMDevLabs.Toolkit.Telemetry;
+﻿using CRMDevLabs.Toolkit.Presentation.ViewModels;
+using CRMDevLabs.Toolkit.Services;
+using CRMDevLabs.Toolkit.Telemetry;
 using Microsoft.VisualStudio.PlatformUI;
 using System.Windows;
-using XRM.Deploy.Vsix.Services;
-using XRM.Deploy.Vsix.ViewModels;
 
 namespace CRMDevLabs.Toolkit.Presentation.Views
 {

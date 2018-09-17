@@ -8,7 +8,7 @@ using Microsoft.TeamFoundation.VersionControl.Client;
 using System;
 using System.Linq;
 
-namespace XRM.Deploy.Core
+namespace CRMDevLabs.Toolkit.Feature.WebResource
 {
     public class PublishOrchestrator
     {

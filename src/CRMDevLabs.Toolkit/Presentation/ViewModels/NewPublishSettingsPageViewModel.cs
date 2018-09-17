@@ -1,4 +1,6 @@
 ﻿using CRMDevLabs.Toolkit.Common.Serialization;
+using CRMDevLabs.Toolkit.Presentation.Models;
+using CRMDevLabs.Toolkit.Services;
 using CRMDevLabs.Toolkit.Telemetry;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -8,10 +10,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
-using XRM.Deploy.Vsix.Models;
-using XRM.Deploy.Vsix.Services;
 
-namespace XRM.Deploy.Vsix.ViewModels
+namespace CRMDevLabs.Toolkit.Presentation.ViewModels
 {
     public class NewPublishSettingsPageViewModel : ViewModelBase
     {

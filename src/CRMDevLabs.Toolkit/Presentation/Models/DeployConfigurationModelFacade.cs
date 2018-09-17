@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 
-namespace XRM.Deploy.Vsix.Models
+namespace CRMDevLabs.Toolkit.Presentation.Models
 {
     [Serializable]
     public class DeployConfigurationModelFacade : ObservableObject

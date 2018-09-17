@@ -9,8 +9,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Task = System.Threading.Tasks.Task;
 
-namespace XRM.Deploy.Vsix.Commands.DeployCommand
+namespace CRMDevLabs.Toolkit.Commands.DeployCommand
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -59,10 +60,10 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
 
-        protected override System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            Deploy.Initialize(this);
-            return base.InitializeAsync(cancellationToken, progress);
+            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await Deploy.InitializeAsync(this);
         }
 
         #endregion

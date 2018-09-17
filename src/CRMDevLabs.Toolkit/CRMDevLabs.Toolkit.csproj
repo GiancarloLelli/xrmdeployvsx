@@ -74,6 +74,7 @@
   <ItemGroup>
     <Content Include="Assets\Logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <VSCTCompile Include="Commands\DeployCommand\DeployPackage.vsct">
       <SubType>Designer</SubType>
