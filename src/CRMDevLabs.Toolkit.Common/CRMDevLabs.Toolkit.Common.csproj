@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Extensions\ListExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\XmlObjectsHelper.cs" />
     <Compile Include="Telemetry\VersionHelper.cs" />
   </ItemGroup>
   <ItemGroup>

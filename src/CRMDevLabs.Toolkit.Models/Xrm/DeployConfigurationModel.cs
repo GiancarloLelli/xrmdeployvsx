@@ -1,7 +1,6 @@
 ﻿using CRMDevLabs.Toolkit.Models.AzOps;
-using CRMDevLabs.Toolkit.Models.Xrm;
 
-namespace CrmDevLabs.Toolkit.Models.Xrm
+namespace CRMDevLabs.Toolkit.Models.Xrm
 {
     public class DeployConfigurationModel
     {

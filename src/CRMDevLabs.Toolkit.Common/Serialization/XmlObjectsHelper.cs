@@ -2,9 +2,9 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Xrm.Deploy.Vsix.Helpers
+namespace CRMDevLabs.Toolkit.Common.Serialization
 {
-    internal class XmlObjectsHelper
+    public class XmlObjectsHelper
     {
         public static T Deserialize<T>(string path) where T : class
         {

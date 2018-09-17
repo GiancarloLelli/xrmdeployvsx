@@ -1,20 +1,17 @@
-﻿using GalaSoft.MvvmLight;
+﻿using CRMDevLabs.Toolkit.Common.Serialization;
+using CRMDevLabs.Toolkit.Telemetry;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.VisualStudio.PlatformUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.IO;
-using Xrm.Deploy.Vsix.Helpers;
-using XRM.Deploy.Vsix.Extensions;
 using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;
-using XRM.Telemetry;
 
 namespace XRM.Deploy.Vsix.ViewModels
 {
-    internal class NewPublishSettingsPageViewModel : ViewModelBase
+    public class NewPublishSettingsPageViewModel : ViewModelBase
     {
         private readonly DteService m_service;
         private readonly TelemetryWrapper m_telemetry;

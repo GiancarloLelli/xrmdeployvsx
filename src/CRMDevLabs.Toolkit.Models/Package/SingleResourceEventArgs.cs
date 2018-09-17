@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XRM.Deploy.Vsix.Models
+namespace CRMDevLabs.Toolkit.Models.Package
 {
     internal class SingleResourceEventArgs : EventArgs
     {
