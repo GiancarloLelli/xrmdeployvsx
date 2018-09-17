@@ -122,8 +122,8 @@
       <HintPath>..\..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ApplicationInsights, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.7.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.ApplicationInsights.2.7.2\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.CSharp" />
@@ -224,7 +224,11 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Diagnostics.DiagnosticSource.4.5.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -256,20 +260,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\XRM.Deploy.Core\XRM.Deploy.Core.csproj">
-      <Project>{6d7bab75-d5ae-4e14-bfa8-e0704a0d795f}</Project>
-      <Name>XRM.Deploy.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XRM.Sdk.Dynamics\XRM.Sdk.Dynamics.csproj">
-      <Project>{f62dd55b-26e4-46d4-b78b-9c860e7949b0}</Project>
-      <Name>XRM.Sdk.Dynamics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XRM.Telemetry\XRM.Telemetry.csproj">
-      <Project>{92f998cc-f3b0-428d-9891-4124109d4ad7}</Project>
-      <Name>XRM.Telemetry</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

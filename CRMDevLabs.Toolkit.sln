@@ -3,13 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Deploy.Core", "src\XRM.Deploy.Core\XRM.Deploy.Core.csproj", "{6D7BAB75-D5AE-4E14-BFA8-E0704A0D795F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Deploy.Vsix", "src\XRM.Deploy.Vsix\XRM.Deploy.Vsix.csproj", "{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Telemetry", "src\XRM.Telemetry\XRM.Telemetry.csproj", "{92F998CC-F3B0-428D-9891-4124109D4AD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Telemetry", "src\CRMDevLabs.Toolkit.Telemetry\CRMDevLabs.Toolkit.Telemetry.csproj", "{2D5AD7C0-FA12-4DFF-A828-7E612865D36A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRM.Sdk.Dynamics", "src\XRM.Sdk.Dynamics\XRM.Sdk.Dynamics.csproj", "{F62DD55B-26E4-46D4-B78B-9C860E7949B0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legacy", "Legacy", "{7BDD8A02-CD62-412E-8757-C9787B9B0AB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Xrm", "src\CRMDevLabs.Toolkit.Xrm\CRMDevLabs.Toolkit.Xrm.csproj", "{829F4CF1-4F73-48DA-9059-9AB96CECF774}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Models", "src\CRMDevLabs.Toolkit.Models\CRMDevLabs.Toolkit.Models.csproj", "{25B98DEC-5625-454B-8B79-5279A2FD7271}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Common", "src\CRMDevLabs.Toolkit.Common\CRMDevLabs.Toolkit.Common.csproj", "{04FF1CFA-51F8-4FA2-9F5F-3E8F7DF25383}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Feature.WebResource", "src\CRMDevLabs.Toolkit.Feature.WebResource\CRMDevLabs.Toolkit.Feature.WebResource.csproj", "{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Features", "Features", "{C5D2E3C3-1F52-4461-946B-CDBFEF1EC29C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.AzOps", "src\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.AzOps.csproj", "{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Package", "Package", "{F4B520AB-DED9-4272-8AD9-4ABB21B01D36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,25 +29,41 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6D7BAB75-D5AE-4E14-BFA8-E0704A0D795F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D7BAB75-D5AE-4E14-BFA8-E0704A0D795F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D7BAB75-D5AE-4E14-BFA8-E0704A0D795F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D7BAB75-D5AE-4E14-BFA8-E0704A0D795F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92F998CC-F3B0-428D-9891-4124109D4AD7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F62DD55B-26E4-46D4-B78B-9C860E7949B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F62DD55B-26E4-46D4-B78B-9C860E7949B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F62DD55B-26E4-46D4-B78B-9C860E7949B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F62DD55B-26E4-46D4-B78B-9C860E7949B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D5AD7C0-FA12-4DFF-A828-7E612865D36A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D5AD7C0-FA12-4DFF-A828-7E612865D36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D5AD7C0-FA12-4DFF-A828-7E612865D36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D5AD7C0-FA12-4DFF-A828-7E612865D36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{829F4CF1-4F73-48DA-9059-9AB96CECF774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{829F4CF1-4F73-48DA-9059-9AB96CECF774}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{829F4CF1-4F73-48DA-9059-9AB96CECF774}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{829F4CF1-4F73-48DA-9059-9AB96CECF774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25B98DEC-5625-454B-8B79-5279A2FD7271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25B98DEC-5625-454B-8B79-5279A2FD7271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25B98DEC-5625-454B-8B79-5279A2FD7271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25B98DEC-5625-454B-8B79-5279A2FD7271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04FF1CFA-51F8-4FA2-9F5F-3E8F7DF25383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04FF1CFA-51F8-4FA2-9F5F-3E8F7DF25383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04FF1CFA-51F8-4FA2-9F5F-3E8F7DF25383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04FF1CFA-51F8-4FA2-9F5F-3E8F7DF25383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{276B1151-EE8E-42D1-BE0F-CEA8DBEDFA87} = {7BDD8A02-CD62-412E-8757-C9787B9B0AB6}
+		{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68} = {C5D2E3C3-1F52-4461-946B-CDBFEF1EC29C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {823817AB-83E6-475B-B336-BD30CD72B436}
