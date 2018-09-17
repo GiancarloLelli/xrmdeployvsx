@@ -13,11 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Common",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Feature.WebResource", "src\CRMDevLabs.Toolkit.Feature.WebResource\CRMDevLabs.Toolkit.Feature.WebResource.csproj", "{0BBFF5A6-7E7B-4AB6-822E-2C6A39BB9D68}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Features", "Features", "{C5D2E3C3-1F52-4461-946B-CDBFEF1EC29C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Features", "01 - Features", "{C5D2E3C3-1F52-4461-946B-CDBFEF1EC29C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.AzOps", "src\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.AzOps.csproj", "{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Package", "Package", "{F4B520AB-DED9-4272-8AD9-4ABB21B01D36}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Package", "00 - Package", "{F4B520AB-DED9-4272-8AD9-4ABB21B01D36}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit", "src\CRMDevLabs.Toolkit\CRMDevLabs.Toolkit.csproj", "{504CCD31-2A88-42E6-A14A-20F55EF681D2}"
 EndProject
