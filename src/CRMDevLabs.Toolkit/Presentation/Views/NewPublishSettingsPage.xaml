@@ -5,7 +5,7 @@
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
             ResizeMode="NoResize" ShowInTaskbar="True" HasMinimizeButton="True"
-            Title="Avanade CRM Toolkit - Web Resource Publish Settings"
+            Title="Avanade Dynamics 365 Toolkit - Web Resource Publish Settings"
             WindowStartupLocation="CenterScreen"
             Width="650" Height="400" x:Name="WizardWindow"
             mc:Ignorable="d">
