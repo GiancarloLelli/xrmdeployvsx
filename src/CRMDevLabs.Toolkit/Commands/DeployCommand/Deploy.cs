@@ -116,7 +116,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
 
                 // Delete settings after breaking update
-                var settingsKey = "IsConfigDeleted-2.1";
+                var settingsKey = "IsConfigDeleted-3.0";
                 if (!m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, settingsKey, false) && !string.IsNullOrEmpty(publishSettigsPath))
                 {
                     File.Delete(publishSettigsPath);

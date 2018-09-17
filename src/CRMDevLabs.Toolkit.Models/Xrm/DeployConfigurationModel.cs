@@ -7,10 +7,10 @@ namespace CRMDevLabs.Toolkit.Models.Xrm
         public DeployConfigurationModel()
         {
             SourceControlSettings = new SourceControlConnectionSettings();
-            CrmSettings = new DynamicsConnectionSettings();
+            DynamicsSettings = new DynamicsConnectionSettings();
         }
 
-        public DynamicsConnectionSettings CrmSettings { get; set; }
+        public DynamicsConnectionSettings DynamicsSettings { get; set; }
 
         public SourceControlConnectionSettings SourceControlSettings { get; set; }
 
@@ -21,14 +21,5 @@ namespace CRMDevLabs.Toolkit.Models.Xrm
         public string Workspace { get; set; }
 
         public bool CheckInEnabled { get; set; }
-
-        public bool UseConfigCredentials
-        {
-            get
-            {
-                return (!string.IsNullOrEmpty(SourceControlSettings.User) && !string.IsNullOrEmpty(SourceControlSettings.Password)) ||
-                        !string.IsNullOrEmpty(SourceControlSettings.Pat);
-            }
-        }
     }
 }

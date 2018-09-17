@@ -1,7 +1,6 @@
 ﻿using CRMDevLabs.Toolkit.Telemetry;
 using Microsoft.VisualStudio.PlatformUI;
 using System.Windows;
-using System.Windows.Controls;
 using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
 
@@ -23,18 +22,6 @@ namespace CRMDevLabs.Toolkit.Presentation.Views
         }
 
         private void CancelPublish(object sender, RoutedEventArgs e) => Close();
-
-        private void PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            var pbox = sender as PasswordBox;
-            (DataContext as NewPublishSettingsPageViewModel).Configuration.Password = pbox?.Password;
-        }
-
-        private void CrmPasswordChanged(object sender, RoutedEventArgs e)
-        {
-            var pbox = sender as PasswordBox;
-            (DataContext as NewPublishSettingsPageViewModel).Configuration.CrmPassword = pbox?.Password;
-        }
 
         private void ClickForNavigationOnPatHowTo(object sender, RoutedEventArgs e)
         {

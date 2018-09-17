@@ -1,7 +1,6 @@
 ﻿using CRMDevLabs.Toolkit.Models.Telemetry;
 using CRMDevLabs.Toolkit.Models.Xrm;
 using Microsoft.VisualStudio.Services.Common;
-using System.Net;
 
 namespace CRMDevLabs.Toolkit.AzOps.Providers
 {
@@ -9,28 +8,10 @@ namespace CRMDevLabs.Toolkit.AzOps.Providers
     {
         public static VssCredentials GetCredentials(DeployConfigurationModel con)
         {
-            // Defaults to NTLM authentication
-            var credentials = new VssCredentials(true);
+            if (string.IsNullOrEmpty(con.SourceControlSettings.Pat))
+                throw new ToolkitException("Invalid Azure DevOps authentication settings. Read the docs to properly confiure the toolkit.");
 
-            if (con.UseConfigCredentials)
-            {
-                if (con.SourceControlSettings.IsOnline)
-                {
-                    // VSTS - Personal Access Token
-                    credentials = new VssBasicCredential(string.Empty, con.SourceControlSettings.Pat);
-                }
-                else if (con.SourceControlSettings.IsOnPrem)
-                {
-                    // TFS On Premise - domain\user & password authentication
-                    var networkCredential = new NetworkCredential(con.SourceControlSettings.User, con.SourceControlSettings.Password, con.SourceControlSettings.Domain);
-                    var windowsCredential = new WindowsCredential(networkCredential);
-                    credentials = new VssCredentials(windowsCredential);
-                }
-                else
-                {
-                    throw new ToolkitException("Invalid TFS/VSTS authentication settings. Read the docs to properly confiure the toolkit.");
-                }
-            }
+            var credentials = new VssBasicCredential(string.Empty, con.SourceControlSettings.Pat);
 
             return credentials;
         }

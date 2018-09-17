@@ -47,7 +47,7 @@ namespace XRM.Deploy.Vsix.ViewModels
                 List<ValidationResult> results = new List<ValidationResult>();
                 var validation = Validator.TryValidateObject(Configuration, new ValidationContext(Configuration), results);
 
-                if (!validation || !Configuration.AreCustomFieldsValid(out customError))
+                if (!validation)
                 {
                     results.ForEach((error) => m_service.LogMessage($"[EXCEPTION] => {error.ErrorMessage}", panelGuid));
                     m_service.LogMessage($"[EXCEPTION] => {customError}", panelGuid);

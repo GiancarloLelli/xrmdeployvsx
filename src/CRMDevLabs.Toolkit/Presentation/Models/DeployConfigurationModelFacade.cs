@@ -26,64 +26,17 @@ namespace XRM.Deploy.Vsix.Models
             m_model = new DeployConfigurationModel();
         }
 
-        #region CRM Connection Settings
         [Required]
         public string ConnectionString
         {
-            get { return m_model.CrmSettings.Discovery; }
+            get { return m_model.DynamicsSettings.FullString; }
             set
             {
-                m_model.CrmSettings.Discovery = value;
+                m_model.DynamicsSettings.FullString = value;
                 RaisePropertyChanged(() => ConnectionString);
             }
         }
 
-        [Required]
-        public string CrmUsername
-        {
-            get { return m_model.CrmSettings.Username; }
-            set
-            {
-                m_model.CrmSettings.Username = value;
-                RaisePropertyChanged(() => CrmUsername);
-            }
-        }
-
-        [Required]
-        public string CrmPassword
-        {
-            get { return m_model.CrmSettings.Password; }
-            set
-            {
-                m_model.CrmSettings.Password = value;
-                RaisePropertyChanged(() => CrmPassword);
-            }
-        }
-
-        [Required]
-        public string CrmDomain
-        {
-            get { return m_model.CrmSettings.Domain; }
-            set
-            {
-                m_model.CrmSettings.Domain = value;
-                RaisePropertyChanged(() => CrmDomain);
-            }
-        }
-
-        [Required]
-        public string CrmOrganization
-        {
-            get { return m_model.CrmSettings.OrganizationName; }
-            set
-            {
-                m_model.CrmSettings.OrganizationName = value;
-                RaisePropertyChanged(() => CrmOrganization);
-            }
-        }
-        #endregion
-
-        #region Source Control Settings
         [Required, DataType(DataType.Url)]
         public string TfsProjectCollectionUri
         {
@@ -105,58 +58,7 @@ namespace XRM.Deploy.Vsix.Models
             }
         }
 
-        public bool IsOnPrem
-        {
-            get { return m_model.SourceControlSettings.IsOnPrem; }
-            set
-            {
-                m_model.SourceControlSettings.IsOnPrem = value;
-                RaisePropertyChanged(() => IsOnPrem);
-                CleanOnlineData();
-            }
-        }
-
-        public bool IsOnline
-        {
-            get { return m_model.SourceControlSettings.IsOnline; }
-            set
-            {
-                m_model.SourceControlSettings.IsOnline = value;
-                RaisePropertyChanged(() => IsOnline);
-                CleanOnPremData();
-            }
-        }
-
-        public string Domain
-        {
-            get { return m_model.SourceControlSettings.Domain; }
-            set
-            {
-                m_model.SourceControlSettings.Domain = value;
-                RaisePropertyChanged(() => Domain);
-            }
-        }
-
-        public string User
-        {
-            get { return m_model.SourceControlSettings.User; }
-            set
-            {
-                m_model.SourceControlSettings.User = value;
-                RaisePropertyChanged(() => User);
-            }
-        }
-
-        public string Password
-        {
-            get { return m_model.SourceControlSettings.Password; }
-            set
-            {
-                m_model.SourceControlSettings.Password = value;
-                RaisePropertyChanged(() => Password);
-            }
-        }
-
+        [Required]
         public string Pat
         {
             get { return m_model.SourceControlSettings.Pat; }
@@ -166,9 +68,7 @@ namespace XRM.Deploy.Vsix.Models
                 RaisePropertyChanged(() => Pat);
             }
         }
-        #endregion
 
-        #region General deploy settings
         public bool CheckInEnabled
         {
             get { return m_model.CheckInEnabled; }
@@ -199,38 +99,6 @@ namespace XRM.Deploy.Vsix.Models
                 m_model.Solution = value;
                 RaisePropertyChanged(() => Solution);
             }
-        }
-        #endregion
-
-        private void CleanOnPremData()
-        {
-            Password = string.Empty;
-            Domain = string.Empty;
-        }
-
-        private void CleanOnlineData()
-        {
-            Pat = string.Empty;
-        }
-    }
-
-    public static class DeployConfigurationModelFacadeExtension
-    {
-        public static bool AreCustomFieldsValid(this DeployConfigurationModelFacade model, out string errorContainer)
-        {
-            var validConfiguration = true;
-            errorContainer = string.Empty;
-
-            if (model.IsOnline)
-            {
-                validConfiguration = !string.IsNullOrEmpty(model.User) && !string.IsNullOrEmpty(model.Pat);
-                if (!validConfiguration)
-                {
-                    errorContainer = "You must specify you PAT and user to connect to a VSTS instance.";
-                }
-            }
-
-            return validConfiguration;
         }
     }
 }

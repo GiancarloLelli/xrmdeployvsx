@@ -5,15 +5,15 @@
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
             ResizeMode="NoResize" ShowInTaskbar="True" HasMinimizeButton="True"
-            Title="Avanade CRM Toolkit - New Publish Settings"
+            Title="Avanade CRM Toolkit - Web Resource Publish Settings"
             WindowStartupLocation="CenterScreen"
-            Width="650" Height="590" x:Name="WizardWindow"
+            Width="650" Height="400" x:Name="WizardWindow"
             mc:Ignorable="d">
     <Grid>
         <StackPanel>
             <GroupBox Margin="5" VerticalAlignment="Top">
                 <GroupBox.Header>
-                    <TextBlock Text="CRM Deploy Settings" FontWeight="SemiBold" />
+                    <TextBlock Text="Dynamics 365 Deploy Settings" FontWeight="SemiBold" />
                 </GroupBox.Header>
                 <GroupBox.Content>
                     <Grid>
@@ -30,7 +30,7 @@
                                 <ColumnDefinition Width="120" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="CRM Discovery URL*" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="*Connection String:" VerticalAlignment="Center" />
                             <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.ConnectionString, Mode=TwoWay}"/>
                         </Grid>
                         <StackPanel Grid.Column="0" Grid.Row="1">
@@ -39,41 +39,7 @@
                                     <ColumnDefinition Width="120" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Organization name*" VerticalAlignment="Center" />
-                                <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.CrmOrganization, Mode=TwoWay}"/>
-                            </Grid>
-                            <Grid Height="20" Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Username*" VerticalAlignment="Center" />
-                                <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.CrmUsername, Mode=TwoWay}"/>
-                            </Grid>
-                            <Grid Height="20" Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Password*" VerticalAlignment="Center" />
-                                <PasswordBox Grid.Column="1" HorizontalAlignment="Stretch" PasswordChanged="CrmPasswordChanged"  />
-                            </Grid>
-                            <Grid Height="20" Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Domain*" VerticalAlignment="Center" />
-                                <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.CrmDomain, Mode=TwoWay}"/>
-                            </Grid>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Grid.Row="1">
-                            <Grid Height="20" Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Solution Name*" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="*Solution Name:" VerticalAlignment="Center" />
                                 <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Solution, Mode=TwoWay}"/>
                             </Grid>
                             <Grid Height="20" Margin="5">
@@ -81,7 +47,7 @@
                                     <ColumnDefinition Width="120" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Solution Prefix*" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="*Solution Prefix:" VerticalAlignment="Center" />
                                 <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Prefix, Mode=TwoWay}"/>
                             </Grid>
                         </StackPanel>
@@ -90,7 +56,7 @@
             </GroupBox>
             <GroupBox Margin="5" VerticalAlignment="Top">
                 <GroupBox.Header>
-                    <TextBlock Text="Version Control Settings" FontWeight="SemiBold" />
+                    <TextBlock Text="Azure DevOps Settings" FontWeight="SemiBold" />
                 </GroupBox.Header>
                 <GroupBox.Content>
                     <StackPanel Margin="0,10,0,0">
@@ -99,30 +65,15 @@
                                 <ColumnDefinition Width="140" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Team Project URL*" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="*Team Project URL:" VerticalAlignment="Center" />
                             <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.TfsProjectCollectionUri, Mode=TwoWay}"/>
-                        </Grid>
-                        <Grid Height="20" Margin="0,5,0,5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                <StackPanel.Resources>
-                                    <Style TargetType="{x:Type RadioButton}">
-                                        <Setter Property="Margin" Value="0,0,10,0"/>
-                                    </Style>
-                                </StackPanel.Resources>
-                                <RadioButton Name="RadioOnPrem" Content="TFS On Premise" IsChecked="{Binding Configuration.IsOnPrem, Mode=TwoWay}" />
-                                <RadioButton Name="RadioOnLine" Content="Visual Studio Team Service" IsChecked="{Binding Configuration.IsOnline, Mode=TwoWay}"/>
-                            </StackPanel>
                         </Grid>
                         <Grid Height="20" Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="140" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Workspace name" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="*Workspace name:" VerticalAlignment="Center" />
                             <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Workspace, Mode=TwoWay}" />
                         </Grid>
                         <Grid Height="20" Margin="5">
@@ -130,33 +81,7 @@
                                 <ColumnDefinition Width="140" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Username" VerticalAlignment="Center" />
-                            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.User, Mode=TwoWay}" />
-                        </Grid>
-                        <Grid Height="20" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Logon Domain" VerticalAlignment="Center" />
-                            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Domain, Mode=TwoWay}" 
-                                     IsEnabled="{Binding ElementName=RadioOnPrem, Path=IsChecked}"/>
-                        </Grid>
-                        <Grid Height="20" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Password" VerticalAlignment="Center" />
-                            <PasswordBox Grid.Column="1" HorizontalAlignment="Stretch" PasswordChanged="PasswordChanged" 
-                                         IsEnabled="{Binding ElementName=RadioOnPrem, Path=IsChecked}"/>
-                        </Grid>
-                        <Grid Height="20" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Personal Access Token" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="*Personal Access Token:" VerticalAlignment="Center" />
                             <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Pat, Mode=TwoWay}" 
                                      IsEnabled="{Binding ElementName=RadioOnLine, Path=IsChecked}"/>
                         </Grid>
@@ -181,9 +106,8 @@
                 </RichTextBox.Resources>
                 <FlowDocument Cursor="Arrow">
                     <Paragraph>(*) Indicates a mandatory field</Paragraph>
-                    <Paragraph>(**) Optional fields, whenever different from Windows' defaults, must be specified</Paragraph>
                     <Paragraph>
-                        <Run Text="(***) You can get a Personal Access Token for VSTS Online following" />
+                        <Run Text="(**) You can get a Personal Access Token for VSTS Online following" />
                         <Hyperlink Cursor="Hand" Click="ClickForNavigationOnPatHowTo">
                             <Hyperlink.Inlines>
                                 <Run Foreground="Blue" Text="this link" />
@@ -193,7 +117,7 @@
                 </FlowDocument>
             </RichTextBox>
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,10,0">
-                <Button Content="Ok" Width="90" Height="30" Margin="0,0,5,0" Command="{Binding SaveConfigurationCommand}" CommandParameter="{Binding ElementName=WizardWindow}" />
+                <Button Content="Save &amp; Continue" Width="110" Height="30" Margin="0,0,5,0" Command="{Binding SaveConfigurationCommand}" CommandParameter="{Binding ElementName=WizardWindow}" />
                 <Button Content="Cancel" Width="90" Height="30" Click="CancelPublish" />
             </StackPanel>
         </StackPanel>

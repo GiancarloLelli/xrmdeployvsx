@@ -21,11 +21,10 @@ namespace XRM.Deploy.Core
                 Action<string> reportAction = (m) => { ReportProgress?.Invoke(this, m); };
                 var tfsCollectionUri = new Uri(deployConfiguration.SourceControlSettings.TFSCollectionUrl, UriKind.Absolute);
                 var tfsClientCredentials = CredentialsProvider.GetCredentials(deployConfiguration);
-                var context = new XrmService(deployConfiguration.CrmSettings, deployConfiguration.Solution, telemetry, reportAction);
+                var context = new XrmService(deployConfiguration.DynamicsSettings, deployConfiguration.Solution, telemetry, reportAction);
 
-                var userName = !string.IsNullOrEmpty(deployConfiguration.SourceControlSettings.User) ? deployConfiguration.SourceControlSettings.User : Environment.UserName;
                 var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
-                var sourceControl = new VersioningService(workspaceName, userName, tfsCollectionUri, tfsClientCredentials, reportAction, telemetry);
+                var sourceControl = new VersioningService(workspaceName, Environment.UserName, tfsCollectionUri, tfsClientCredentials, reportAction, telemetry);
                 var sourceControlResult = sourceControl.InitializeWorkspace();
 
                 // Must resolve conflicts or something went wrong with TFS interaction
@@ -42,7 +41,7 @@ namespace XRM.Deploy.Core
             }
             catch (Exception exception)
             {
-                ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}\n");
+                ReportProgress?.Invoke(this, $"[ERROR] => {exception.Message}\n");
                 if (!(exception is ToolkitException))
                     telemetry.TrackExceptionWithCustomMetrics(exception);
             }
@@ -53,22 +52,22 @@ namespace XRM.Deploy.Core
             try
             {
                 ChangeManagerService container = new ChangeManagerService(changes, deployConfiguration.Prefix, context);
-                ReportProgress?.Invoke(this, $"[TFS] => Add: {container.AddedItems} - Edit: {container.EditedItems} - Delete: {container.DeletedItems}");
+                ReportProgress?.Invoke(this, $"[AZOPS] => Add: {container.AddedItems} - Edit: {container.EditedItems} - Delete: {container.DeletedItems}");
 
                 if (container.WebResources.Count > 0)
                 {
-                    ReportProgress?.Invoke(this, $"[CRM] => Found {container.WebResources.Count} Web Resource.");
-                    ReportProgress?.Invoke(this, $"[CRM] => '{deployConfiguration.Prefix}' used as base path.");
-                    ReportProgress?.Invoke(this, $"[CRM] => Fetching '{deployConfiguration.Solution}' solution from CRM.");
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Found {container.WebResources.Count} Web Resource.");
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => '{deployConfiguration.Prefix}' used as base path.");
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Fetching '{deployConfiguration.Solution}' solution from CRM.");
                     container.EnsureContinue(deployConfiguration.Solution, deployConfiguration.Prefix);
 
-                    ReportProgress?.Invoke(this, $"[CRM] => Writing changes to the CRM.");
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Writing changes to the CRM.");
                     var faultedFlushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
-                    ReportProgress?.Invoke(this, $"[CRM] => Writing completed.");
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Writing completed.");
 
                     if (!faultedFlushResult && deployConfiguration.CheckInEnabled)
                     {
-                        ReportProgress?.Invoke(this, $"[TFS] => Checking in changes.");
+                        ReportProgress?.Invoke(this, $"[AZOPS] => Checking in changes.");
                         sourceControl.CheckInChanges();
                     }
                 }
@@ -77,7 +76,7 @@ namespace XRM.Deploy.Core
             }
             catch (Exception exception)
             {
-                ReportProgress?.Invoke(this, $"[EXCEPTION] => {exception.Message}\n");
+                ReportProgress?.Invoke(this, $"[ERROR] => {exception.Message}\n");
                 if (!(exception is ToolkitException))
                     telemetry.TrackExceptionWithCustomMetrics(exception);
             }
