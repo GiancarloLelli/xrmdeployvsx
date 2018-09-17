@@ -80,6 +80,7 @@
     </VSCTCompile>
     <Content Include="license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +173,8 @@
     <Reference Include="Microsoft.VisualStudio.Validation, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.15.0.82\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -181,12 +184,18 @@
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MvvmLightLibs.5.4.1.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CRMDevLabs.Toolkit.Common\CRMDevLabs.Toolkit.Common.csproj">
       <Project>{04ff1cfa-51f8-4fa2-9f5f-3e8f7df25383}</Project>
       <Name>CRMDevLabs.Toolkit.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CRMDevLabs.Toolkit.Feature.WebResource\CRMDevLabs.Toolkit.Feature.WebResource.csproj">
+      <Project>{0bbff5a6-7e7b-4ab6-822e-2c6a39bb9d68}</Project>
+      <Name>CRMDevLabs.Toolkit.Feature.WebResource</Name>
     </ProjectReference>
     <ProjectReference Include="..\CRMDevLabs.Toolkit.Models\CRMDevLabs.Toolkit.Models.csproj">
       <Project>{25b98dec-5625-454b-8b79-5279a2fd7271}</Project>
@@ -195,6 +204,10 @@
     <ProjectReference Include="..\CRMDevLabs.Toolkit.Telemetry\CRMDevLabs.Toolkit.Telemetry.csproj">
       <Project>{2d5ad7c0-fa12-4dff-a828-7e612865d36a}</Project>
       <Name>CRMDevLabs.Toolkit.Telemetry</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CRMDevLabs.Toolkit.Xrm\CRMDevLabs.Toolkit.Xrm.csproj">
+      <Project>{829f4cf1-4f73-48da-9059-9ab96cecf774}</Project>
+      <Name>CRMDevLabs.Toolkit.Xrm</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,11 +1,11 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
+﻿using CRMDevLabs.Toolkit.Telemetry;
+using Microsoft.VisualStudio.PlatformUI;
 using System.Windows;
 using System.Windows.Controls;
 using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
-using XRM.Telemetry;
 
-namespace XRM.Deploy.Vsix.Views
+namespace CRMDevLabs.Toolkit.Presentation.Views
 {
     public partial class NewPublishSettingsPage : DialogWindow
     {

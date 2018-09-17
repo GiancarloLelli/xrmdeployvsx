@@ -2,9 +2,11 @@
 using CRMDevLabs.Toolkit.Telemetry;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.VisualStudio.PlatformUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;

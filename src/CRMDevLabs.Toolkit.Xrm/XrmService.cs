@@ -1,5 +1,4 @@
-﻿using CrmDevLabs.Toolkit.Models.Xrm;
-using CRMDevLabs.Toolkit.Models.Xrm;
+﻿using CRMDevLabs.Toolkit.Models.Xrm;
 using CRMDevLabs.Toolkit.Telemetry;
 using CRMDevLabs.Toolkit.Xrm.Factories;
 using CRMDevLabs.Toolkit.Xrm.Models;

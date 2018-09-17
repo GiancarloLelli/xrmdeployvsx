@@ -1,5 +1,5 @@
-﻿using CrmDevLabs.Toolkit.Models.Xrm;
-using CRMDevLabs.Toolkit.Models.Telemetry;
+﻿using CRMDevLabs.Toolkit.Models.Telemetry;
+using CRMDevLabs.Toolkit.Models.Xrm;
 using Microsoft.VisualStudio.Services.Common;
 using System.Net;
 

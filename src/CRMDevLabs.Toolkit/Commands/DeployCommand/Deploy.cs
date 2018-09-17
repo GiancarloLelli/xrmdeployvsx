@@ -1,17 +1,20 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using CRMDevLabs.Toolkit.Common.Serialization;
+using CRMDevLabs.Toolkit.Common.Telemetry;
+using CRMDevLabs.Toolkit.Models.Package;
+using CRMDevLabs.Toolkit.Models.Telemetry;
+using CRMDevLabs.Toolkit.Presentation.Views;
+using CRMDevLabs.Toolkit.Telemetry;
+using CRMDevLabs.Toolkit.Xrm.Artifacts;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
 using System.IO;
-using Xrm.Deploy.Vsix.Helpers;
+using System.Threading;
+using System.Threading.Tasks;
 using XRM.Deploy.Core;
-using XRM.Deploy.Core.Helpers;
 using XRM.Deploy.Vsix.Models;
 using XRM.Deploy.Vsix.Services;
 using XRM.Deploy.Vsix.ViewModels;
-using XRM.Deploy.Vsix.Views;
-using XRM.Telemetry;
-using XRM.Telemetry.Helpers;
-using XRM.Telemetry.Models;
 using Async = System.Threading.Tasks;
 
 namespace XRM.Deploy.Vsix.Commands.DeployCommand
@@ -19,6 +22,8 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
     internal sealed class Deploy
     {
         private Guid m_pane;
+        private CancellationToken m_token;
+
         private readonly Package m_package;
         private readonly DteService m_service;
         private readonly TelemetryWrapper m_telemetry;
@@ -36,6 +41,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
 
         private Deploy(Package package)
         {
+            m_token = new CancellationToken();
             m_package = package ?? throw new ArgumentNullException(nameof(package));
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService(ServiceProvider);
@@ -72,7 +78,7 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
             var isDeployEnabled = m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, projectName, false);
 
             var file = new FileInfo(objectName);
-            menu.Enabled = isDeployEnabled && CrmExtensionsHelper.GetCrmExtensionNumber(objectName) != 99;
+            menu.Enabled = isDeployEnabled && FileExtensionToCodeConverter.Convert(objectName) != 99;
             menu.Text = $"Deploy {file.Name} to CRM";
         }
 
@@ -132,11 +138,11 @@ namespace XRM.Deploy.Vsix.Commands.DeployCommand
                 var orchestrator = new PublishOrchestrator();
                 orchestrator.ReportProgress += LogProgress;
 
-                Async.Task.Factory.StartNew(() =>
+                var task = Async.Task.Factory.StartNew(() =>
                 {
                     orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry, singleResourceName, projectName);
                     orchestrator.ReportProgress -= LogProgress;
-                });
+                }, m_token, TaskCreationOptions.None, TaskScheduler.Current);
             }
             catch (Exception ex)
             {

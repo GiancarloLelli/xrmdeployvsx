@@ -1,7 +1,7 @@
-﻿using CrmDevLabs.Toolkit.Models.Xrm;
-using CRMDevLabs.Toolkit.AzOps;
+﻿using CRMDevLabs.Toolkit.AzOps;
 using CRMDevLabs.Toolkit.AzOps.Providers;
 using CRMDevLabs.Toolkit.Models.Telemetry;
+using CRMDevLabs.Toolkit.Models.Xrm;
 using CRMDevLabs.Toolkit.Telemetry;
 using CRMDevLabs.Toolkit.Xrm;
 using Microsoft.TeamFoundation.VersionControl.Client;

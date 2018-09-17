@@ -2,7 +2,7 @@
 
 namespace CRMDevLabs.Toolkit.Models.Package
 {
-    internal class SingleResourceEventArgs : EventArgs
+    public class SingleResourceEventArgs : EventArgs
     {
         public string File { get; set; }
 
