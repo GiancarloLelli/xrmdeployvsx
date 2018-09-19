@@ -30,6 +30,9 @@ namespace CRMDevLabs.Toolkit.Telemetry
     {
         public static void TrackExceptionWithCustomMetrics(this TelemetryWrapper client, Exception ex)
         {
+            if (Debugger.IsAttached)
+                return;
+
             var metrics = new Dictionary<string, string>();
             metrics.Add("Username", Environment.UserName);
             metrics.Add("Machine Name", Environment.MachineName);
@@ -46,6 +49,9 @@ namespace CRMDevLabs.Toolkit.Telemetry
 
         public static void TrackCustomEventWithCustomMetrics(this TelemetryWrapper client, string eventName, MetricData data)
         {
+            if (Debugger.IsAttached)
+                return;
+
             var eventData = new EventTelemetry(eventName);
             eventData.Timestamp = DateTime.UtcNow;
             eventData.Properties.Add(data.Key, data.Value);

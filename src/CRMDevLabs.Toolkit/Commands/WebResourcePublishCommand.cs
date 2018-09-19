@@ -10,16 +10,17 @@ using CRMDevLabs.Toolkit.Services;
 using CRMDevLabs.Toolkit.Telemetry;
 using CRMDevLabs.Toolkit.Xrm.Artifacts;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Async = System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
-namespace CRMDevLabs.Toolkit.Commands.DeployCommand
+namespace CRMDevLabs.Toolkit.Commands
 {
-    internal sealed class Deploy
+    internal sealed class WebResourcePublishCommand
     {
         private Guid m_pane;
         private CancellationToken m_token;
@@ -31,27 +32,19 @@ namespace CRMDevLabs.Toolkit.Commands.DeployCommand
         public const int DeployCommandId = 0x1024;
         public const int SingleDeployCommandId = 0x1025;
         private const string SETTINGS_STORE = "CRMToolkit";
-        public static readonly Guid CommandSet = new Guid("222af809-1598-498f-a9d7-6b130d420527");
 
-        public static Deploy Instance { get; private set; }
+        public static readonly Guid CommandSet = new Guid("df1214b3-0c72-4b2e-b906-c5f469fbe3bc");
 
-        private IServiceProvider ServiceProvider { get { return m_package; } }
 
-        public static async Async.Task InitializeAsync(AsyncPackage package)
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
-            Instance = new Deploy(package);
-        }
-
-        private Deploy(AsyncPackage package)
+        private WebResourcePublishCommand(AsyncPackage package, OleMenuCommandService commandService, IVsSettingsManager vsSettingsManager)
         {
             m_token = new CancellationToken();
             m_package = package ?? throw new ArgumentNullException(nameof(package));
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
-            m_service = new DteService(ServiceProvider);
+            m_service = new DteService(vsSettingsManager);
+
             m_telemetry = new TelemetryWrapper(m_service.Version, VersionHelper.GetVersionFromManifest());
 
-            var commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
                 var deployMenuCommandID = new CommandID(CommandSet, DeployCommandId);
@@ -146,7 +139,7 @@ namespace CRMDevLabs.Toolkit.Commands.DeployCommand
                 {
                     orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry, singleResourceName, projectName);
                     orchestrator.ReportProgress -= LogProgress;
-                }, m_token, TaskCreationOptions.None, TaskScheduler.Current);
+                }, m_token, Async.TaskCreationOptions.None, Async.TaskScheduler.Current);
             }
             catch (Exception ex)
             {
@@ -177,5 +170,17 @@ namespace CRMDevLabs.Toolkit.Commands.DeployCommand
         }
 
         private void LogProgress(object sender, string e) => m_service.LogMessage(e, m_pane);
+
+        public static WebResourcePublishCommand Instance { get; private set; }
+
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider { get { return this.m_package; } }
+
+        public static async Task InitializeAsync(AsyncPackage package)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+            var commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
+            var settingsManager = await package.GetServiceAsync(typeof(SVsSettingsManager)) as IVsSettingsManager;
+            Instance = new WebResourcePublishCommand(package, commandService, settingsManager);
+        }
     }
 }

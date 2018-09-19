@@ -2,23 +2,24 @@
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <Extern href="stdidcmd.h"/>
   <Extern href="vsshlids.h"/>
-  <Commands package="guidDeployPackage">
+  
+  <Commands package="guidWebResourcePublishCommandPackage">
 
     <Groups>
       <Group guid="guidDeployPackageCmdSet" id="MyRoot" priority="0x0000">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
       </Group>
       <Group guid="guidDeployPackageCmdSet" id="MyProjectRoot" priority="0x0000">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
       </Group>
       <Group guid="guidDeployPackageCmdSet" id="MySubMenuGroup" priority="0x0100">
-        <Parent guid="guidDeployPackageCmdSet" id="MyMenuGroup"/>
+        <Parent guid="guidDeployPackageCmdSet" id="MyMenuGroup" />
       </Group>
     </Groups>
-    
+
     <Menus>
       <Menu guid="guidDeployPackageCmdSet" id="MyMenuGroup" type="Menu" priority="0x0100">
-        <Parent guid="guidDeployPackageCmdSet" id="MyRoot"/>
+        <Parent guid="guidDeployPackageCmdSet" id="MyRoot" />
         <CommandFlag>IconAndText</CommandFlag>
         <Strings>
           <ButtonText>Web Resource Publisher</ButtonText>
@@ -42,7 +43,7 @@
           <ButtonText>Deploy changes to Dynamics 365</ButtonText>
         </Strings>
       </Button>
-      
+
       <!-- Single item deploy CMD -->
       <Button guid="guidDeployPackageCmdSet" id="SingleDeployId" type="Button" priority="0x0100">
         <Parent guid="guidDeployPackageCmdSet" id="MyProjectRoot" />
@@ -52,11 +53,15 @@
         </Strings>
       </Button>
     </Buttons>
-    
+
   </Commands>
+
   <Symbols>
-    <GuidSymbol name="guidDeployPackage" value="{6d049236-2a90-46f4-a937-5862912036fb}" />
-    <GuidSymbol name="guidDeployPackageCmdSet" value="{222af809-1598-498f-a9d7-6b130d420527}">
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidWebResourcePublishCommandPackage" value="{efd2a755-9bc7-494f-9f48-bbe33c9b9c61}" />
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidDeployPackageCmdSet" value="{df1214b3-0c72-4b2e-b906-c5f469fbe3bc}">
       <IDSymbol name="MyProjectRoot" value="0x1018" />
       <IDSymbol name="MyRoot" value="0x1019" />
       <IDSymbol name="MyMenuGroup" value="0x1020" />

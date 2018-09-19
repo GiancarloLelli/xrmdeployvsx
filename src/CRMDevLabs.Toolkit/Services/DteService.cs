@@ -13,7 +13,7 @@ namespace CRMDevLabs.Toolkit.Services
     public class DteService
     {
         private readonly DTE2 m_environment;
-        private readonly IServiceProvider m_provider;
+        private readonly IVsSettingsManager m_provider;
 
         public string PropertiesDirectory { get; private set; }
 
@@ -57,7 +57,7 @@ namespace CRMDevLabs.Toolkit.Services
             }
         }
 
-        public DteService(IServiceProvider provider)
+        public DteService(IVsSettingsManager provider)
         {
             m_environment = Package.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             m_provider = provider;
