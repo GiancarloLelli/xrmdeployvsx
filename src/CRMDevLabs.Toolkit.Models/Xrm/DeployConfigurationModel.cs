@@ -19,7 +19,5 @@ namespace CRMDevLabs.Toolkit.Models.Xrm
         public string Prefix { get; set; }
 
         public string Workspace { get; set; }
-
-        public bool CheckInEnabled { get; set; }
     }
 }

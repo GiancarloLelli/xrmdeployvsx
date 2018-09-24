@@ -41,7 +41,7 @@ namespace CRMDevLabs.Toolkit.Xrm
             }
             catch (Exception exception)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
+                m_progress?.Invoke($"[ERROR] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
         }
@@ -59,7 +59,7 @@ namespace CRMDevLabs.Toolkit.Xrm
             }
             catch (Exception exception)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
+                m_progress?.Invoke($"[ERROR] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
@@ -74,15 +74,15 @@ namespace CRMDevLabs.Toolkit.Xrm
             {
                 switch (changeType.ToLower())
                 {
-                    case "add":
+                    case "NewInWorkdir":
                         requestFactoryResult.General = OrganizationRequestFactory.CreateFactory(webResource);
                         break;
-                    case "edit":
-                    case "delete":
+                    case "ModifiedInWorkdir":
+                    case "DeletedFromWorkdir":
                         var resourceId = GetResourceIdIfExist(resourceName);
                         if (resourceId != Guid.Empty)
                         {
-                            if (changeType.Equals("delete"))
+                            if (changeType.Equals("DeletedFromWorkdir"))
                             {
                                 requestFactoryResult.General = OrganizationRequestFactory.DeleteFactory(new EntityReference("webresource", resourceId));
                             }
@@ -98,7 +98,7 @@ namespace CRMDevLabs.Toolkit.Xrm
             }
             catch (Exception exception)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
+                m_progress?.Invoke($"[ERROR] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
@@ -152,7 +152,7 @@ namespace CRMDevLabs.Toolkit.Xrm
             }
             catch (Exception exception)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
+                m_progress?.Invoke($"[ERROR] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
@@ -171,7 +171,7 @@ namespace CRMDevLabs.Toolkit.Xrm
             }
             catch (Exception exception)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
+                m_progress?.Invoke($"[ERROR] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 
@@ -196,7 +196,7 @@ namespace CRMDevLabs.Toolkit.Xrm
             }
             catch (Exception exception)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {exception.Message}");
+                m_progress?.Invoke($"[ERROR] => {exception.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(exception);
             }
 

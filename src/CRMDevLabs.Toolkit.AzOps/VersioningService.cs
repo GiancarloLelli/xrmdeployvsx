@@ -1,99 +1,78 @@
 ﻿using CRMDevLabs.Toolkit.AzOps.Models;
 using CRMDevLabs.Toolkit.Telemetry;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.VersionControl.Client;
-using Microsoft.VisualStudio.Services.Common;
+using LibGit2Sharp;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CRMDevLabs.Toolkit.AzOps
 {
     public class VersioningService
     {
-        private readonly string m_workspace;
-        private readonly string m_user;
         private readonly Action<string> m_progress;
         private readonly TelemetryWrapper m_telemetry;
-        private readonly Uri m_tfs;
-        private readonly VssCredentials m_creds;
-        private SourceControlResultModel m_result;
+        private readonly string m_repoPath;
+        private readonly string m_basePath;
 
-        public VersioningService(string workspace, string user, Uri tfs, VssCredentials creds, Action<string> reportProgress, TelemetryWrapper telemetry)
+        public VersioningService(string solutionPath, string baseProjectPath, Action<string> reportProgress, TelemetryWrapper telemetry)
         {
-            m_workspace = workspace;
-            m_user = user;
             m_progress = reportProgress;
             m_telemetry = telemetry;
-            m_tfs = tfs;
-            m_creds = creds;
-            m_result = null;
+            m_repoPath = solutionPath;
+            m_basePath = baseProjectPath;
         }
 
-        public SourceControlResultModel InitializeWorkspace()
+        public SourceControlResultModel QueryLocalRepository()
         {
             SourceControlResultModel result = new SourceControlResultModel();
 
             try
             {
-                using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(m_tfs, m_creds))
+                using (var gitRepo = new Repository(m_repoPath))
                 {
-                    collection.EnsureAuthenticated();
                     m_progress?.Invoke("------------------- START -----------------------");
-                    m_progress?.Invoke($"[TFS] => Detecting changes in the workspace.");
-                    VersionControlServer versionControl = collection.GetService<VersionControlServer>();
-                    Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
+                    m_progress?.Invoke($"[AZOPS] => Detecting changes in the workspace.");
 
-                    result.Changes = workspace.GetPendingChanges();
-                    m_result = result;
+                    var repoStatus = gitRepo.RetrieveStatus();
+                    var totalChanges = repoStatus.Count();
+                    var pendings = new List<RawChanges>();
 
-                    m_progress?.Invoke($"[TFS] => Found {result.Changes.Length} Check-Out items.");
+                    m_progress?.Invoke($"[AZOPS] => Found {repoStatus.Added.Count()} added items.");
+                    m_progress?.Invoke($"[AZOPS] => Found {repoStatus.Modified.Count()} modified items.");
+                    m_progress?.Invoke($"[AZOPS] => Found {repoStatus.Removed.Count()} removed items.");
 
-                    var folderFilters = result.Changes.Select(c => c.LocalOrServerFolder).Distinct().ToArray();
-                    if (folderFilters.Length > 0)
+                    for (int i = 0; i < totalChanges; i++)
                     {
-                        var conflicts = workspace.QueryConflicts(folderFilters, true);
-                        if (conflicts.Length > 0)
+                        var item = repoStatus.ElementAt(i);
+
+                        if (item.State != FileStatus.DeletedFromWorkdir && item.State != FileStatus.ModifiedInWorkdir && item.State != FileStatus.NewInWorkdir)
+                            continue;
+
+                        // Path normalization
+                        var fixedPath = item.FilePath.Replace('/', '\\');
+                        var firstSlashIndex = fixedPath.IndexOf('\\');
+                        fixedPath = fixedPath.Substring(firstSlashIndex);
+
+                        pendings.Add(new RawChanges
                         {
-                            m_progress?.Invoke($"[TFS] => Found {conflicts.Length} conflicts. Update your workspace to continue.");
-                            result.Continue = false;
-                        }
+                            ChangeTypeName = item.State.ToString(),
+                            LocalItem = string.Concat(m_basePath, fixedPath),
+                            FileName = new FileInfo(item.FilePath).Name
+                        });
                     }
+
+                    result.Changes = pendings.ToArray();
                 }
             }
             catch (Exception ex)
             {
-                m_progress?.Invoke($"[EXCEPTION] => {ex.Message}");
+                m_progress?.Invoke($"[ERROR] => {ex.Message}");
                 m_telemetry.TrackExceptionWithCustomMetrics(ex);
                 result.Continue = false;
             }
 
             return result;
-        }
-
-        public void CheckInChanges()
-        {
-            try
-            {
-                if (m_result != null)
-                {
-                    using (TfsTeamProjectCollection collection = new TfsTeamProjectCollection(m_tfs, m_creds))
-                    {
-                        VersionControlServer versionControl = collection.GetService(typeof(VersionControlServer)) as VersionControlServer;
-                        Workspace workspace = versionControl.GetWorkspace(m_workspace, m_user);
-
-                        if (m_result.Changes.Length > 0)
-                        {
-                            workspace.CheckIn(m_result.Changes, $"CI Checkin by {m_user}");
-                            m_progress?.Invoke($"[TFS] => Check-In made on behalf of {m_user}.");
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                m_progress?.Invoke($"[EXCEPTION] => {ex.Message}");
-                m_telemetry.TrackExceptionWithCustomMetrics(ex);
-            }
         }
     }
 }

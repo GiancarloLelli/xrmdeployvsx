@@ -1,6 +1,4 @@
-﻿using Microsoft.TeamFoundation.VersionControl.Client;
-
-namespace CRMDevLabs.Toolkit.AzOps.Models
+﻿namespace CRMDevLabs.Toolkit.AzOps.Models
 {
     public class SourceControlResultModel
     {
@@ -11,6 +9,13 @@ namespace CRMDevLabs.Toolkit.AzOps.Models
 
         public bool Continue { get; set; }
 
-        public PendingChange[] Changes { get; set; }
+        public RawChanges[] Changes { get; set; }
+    }
+
+    public class RawChanges
+    {
+        public string FileName { get; set; }
+        public string ChangeTypeName { get; set; }
+        public string LocalItem { get; set; }
     }
 }

@@ -85,15 +85,6 @@
                             <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Pat, Mode=TwoWay}" 
                                      IsEnabled="{Binding ElementName=RadioOnLine, Path=IsChecked}"/>
                         </Grid>
-                        <Grid Height="20" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Enable auto checkin" VerticalAlignment="Center" />
-                            <CheckBox Grid.Column="1" VerticalAlignment="Center" 
-                                      IsChecked="{Binding Configuration.CheckInEnabled, Mode=TwoWay}" />
-                        </Grid>
                     </StackPanel>
                 </GroupBox.Content>
             </GroupBox>

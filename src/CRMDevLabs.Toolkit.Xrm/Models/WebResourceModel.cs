@@ -42,7 +42,7 @@ namespace CRMDevLabs.Toolkit.Xrm.Models
         {
             get
             {
-                return ChangeType.ToLower().Equals("delete");
+                return ChangeType.ToLower().Equals("DeletedFromWorkdir");
             }
         }
 

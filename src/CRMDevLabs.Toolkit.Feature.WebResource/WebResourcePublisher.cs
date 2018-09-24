@@ -1,10 +1,9 @@
 ﻿using CRMDevLabs.Toolkit.AzOps;
-using CRMDevLabs.Toolkit.AzOps.Providers;
+using CRMDevLabs.Toolkit.AzOps.Models;
 using CRMDevLabs.Toolkit.Models.Telemetry;
 using CRMDevLabs.Toolkit.Models.Xrm;
 using CRMDevLabs.Toolkit.Telemetry;
 using CRMDevLabs.Toolkit.Xrm;
-using Microsoft.TeamFoundation.VersionControl.Client;
 using System;
 using System.Linq;
 
@@ -14,21 +13,18 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
     {
         public event EventHandler<string> ReportProgress;
 
-        public void Publish(DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, string singleResourceName, string project)
+        public void Publish(DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, string singleResourceName, string project, string projectPath, string basePath)
         {
             try
             {
                 Action<string> reportAction = (m) => { ReportProgress?.Invoke(this, m); };
-                var tfsCollectionUri = new Uri(deployConfiguration.SourceControlSettings.TFSCollectionUrl, UriKind.Absolute);
-                var tfsClientCredentials = CredentialsProvider.GetCredentials(deployConfiguration);
                 var context = new XrmService(deployConfiguration.DynamicsSettings, deployConfiguration.Solution, telemetry, reportAction);
-
-                var workspaceName = !string.IsNullOrEmpty(deployConfiguration.Workspace) ? deployConfiguration.Workspace : Environment.MachineName;
-                var sourceControl = new VersioningService(workspaceName, Environment.UserName, tfsCollectionUri, tfsClientCredentials, reportAction, telemetry);
-                var sourceControlResult = sourceControl.InitializeWorkspace();
+                var sourceControl = new VersioningService(projectPath, basePath, reportAction, telemetry);
+                var sourceControlResult = sourceControl.QueryLocalRepository();
 
                 // Must resolve conflicts or something went wrong with TFS interaction
-                if (!sourceControlResult.Continue && sourceControlResult.Changes == null) return;
+                if (!sourceControlResult.Continue && sourceControlResult.Changes == null)
+                    return;
 
                 var changeList = sourceControlResult.Changes;
                 if (!string.IsNullOrEmpty(singleResourceName))
@@ -37,7 +33,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
                     changeList = filteredChangeList;
                 }
 
-                PublishImpl(context, sourceControl, deployConfiguration, telemetry, changeList, project);
+                PublishImpl(context, deployConfiguration, telemetry, changeList, project);
             }
             catch (Exception exception)
             {
@@ -47,7 +43,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
             }
         }
 
-        private void PublishImpl(XrmService context, VersioningService sourceControl, DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, PendingChange[] changes, string project)
+        private void PublishImpl(XrmService context, DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, RawChanges[] changes, string project)
         {
             try
             {
@@ -61,15 +57,9 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
                     ReportProgress?.Invoke(this, $"[DYNAMICS] => Fetching '{deployConfiguration.Solution}' solution from CRM.");
                     container.EnsureContinue(deployConfiguration.Solution, deployConfiguration.Prefix);
 
-                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Writing changes to the CRM.");
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Publishing changes to the CRM.");
                     var faultedFlushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
-                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Writing completed.");
-
-                    if (!faultedFlushResult && deployConfiguration.CheckInEnabled)
-                    {
-                        ReportProgress?.Invoke(this, $"[AZOPS] => Checking in changes.");
-                        sourceControl.CheckInChanges();
-                    }
+                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Publish completed.");
                 }
 
                 telemetry.TrackCustomEventWithCustomMetrics("Deploy Finished", new MetricData("Project Name", project));

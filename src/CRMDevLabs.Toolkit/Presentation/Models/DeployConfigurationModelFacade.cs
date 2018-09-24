@@ -69,16 +69,6 @@ namespace CRMDevLabs.Toolkit.Presentation.Models
             }
         }
 
-        public bool CheckInEnabled
-        {
-            get { return m_model.CheckInEnabled; }
-            set
-            {
-                m_model.CheckInEnabled = value;
-                RaisePropertyChanged(() => CheckInEnabled);
-            }
-        }
-
         [Required, RegularExpression("^[a-zA-z]_$")]
         public string Prefix
         {

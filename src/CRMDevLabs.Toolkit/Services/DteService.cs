@@ -75,6 +75,20 @@ namespace CRMDevLabs.Toolkit.Services
             return File.Exists(publishFilePath) ? publishFilePath : string.Empty;
         }
 
+        public string GetSolutionRootPath()
+        {
+            var fullPath = m_environment.Solution?.FullName;
+
+            var path = string.Empty;
+            if (!string.IsNullOrEmpty(fullPath))
+            {
+                var info = new FileInfo(fullPath);
+                path = info.Directory.FullName;
+            }
+
+            return path;
+        }
+
         public string GetSelectedProjectName()
         {
             var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
@@ -118,7 +132,7 @@ namespace CRMDevLabs.Toolkit.Services
 
                 if (customPane == null)
                 {
-                    outWindow.CreatePane(ref pane, "Avanade CRM Toolkit - Publish Output", 1, 1);
+                    outWindow.CreatePane(ref pane, "Avanade Dynamics 365 Toolkit - Publish Output", 1, 1);
                     outWindow.GetPane(ref pane, out customPane);
                 }
 
@@ -128,6 +142,14 @@ namespace CRMDevLabs.Toolkit.Services
                     customPane.Activate();
                 }
             }
+        }
+
+        public string GetProjectBasePath()
+        {
+            var selectedProjectBase = (m_environment.ActiveSolutionProjects as object[])?.FirstOrDefault();
+            var selectedProject = selectedProjectBase as Project;
+            var fullPath = selectedProject?.FileName;
+            return new FileInfo(fullPath).DirectoryName;
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using CRMDevLabs.Toolkit.Common.Extensions;
+﻿using CRMDevLabs.Toolkit.AzOps.Models;
+using CRMDevLabs.Toolkit.Common.Extensions;
 using CRMDevLabs.Toolkit.Models.Telemetry;
 using CRMDevLabs.Toolkit.Xrm;
 using CRMDevLabs.Toolkit.Xrm.Extensions;
 using CRMDevLabs.Toolkit.Xrm.Models;
-using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
@@ -13,20 +13,20 @@ namespace CRMDevLabs.Toolkit.AzOps
 {
     public class ChangeManagerService
     {
-        private readonly PendingChange[] m_changes;
+        private readonly RawChanges[] m_changes;
         private readonly XrmService m_context;
 
         public int TotalChanges { get { return m_changes.Count(); } }
 
-        public int AddedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("add")); } }
+        public int AddedItems { get { return m_changes.Count(p => p.ChangeTypeName.Equals("NewInWorkdir")); } }
 
-        public int DeletedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("delete")); } }
+        public int DeletedItems { get { return m_changes.Count(p => p.ChangeTypeName.Equals("DeletedFromWorkdir")); } }
 
-        public int EditedItems { get { return m_changes.Count(p => p.ChangeTypeName.ToLower().Equals("edit")); } }
+        public int EditedItems { get { return m_changes.Count(p => p.ChangeTypeName.Equals("ModifiedInWorkdir")); } }
 
         public List<WebResourceModel> WebResources { get; private set; }
 
-        public ChangeManagerService(PendingChange[] changes, string prefix, XrmService wrapper)
+        public ChangeManagerService(RawChanges[] changes, string prefix, XrmService wrapper)
         {
             m_changes = changes;
             m_context = wrapper;
