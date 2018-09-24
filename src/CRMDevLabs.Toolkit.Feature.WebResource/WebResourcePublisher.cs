@@ -28,7 +28,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
                 var sourceControlResult = sourceControl.InitializeWorkspace();
 
                 // Must resolve conflicts or something went wrong with TFS interaction
-                if (!sourceControlResult.Continue && sourceControlResult.Changes != null) return;
+                if (!sourceControlResult.Continue && sourceControlResult.Changes == null) return;
 
                 var changeList = sourceControlResult.Changes;
                 if (!string.IsNullOrEmpty(singleResourceName))

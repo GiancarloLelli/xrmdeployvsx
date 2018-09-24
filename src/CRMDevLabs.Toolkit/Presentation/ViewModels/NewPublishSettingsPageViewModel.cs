@@ -49,8 +49,8 @@ namespace CRMDevLabs.Toolkit.Presentation.ViewModels
 
                 if (!validation)
                 {
-                    results.ForEach((error) => m_service.LogMessage($"[EXCEPTION] => {error.ErrorMessage}", panelGuid));
-                    m_service.LogMessage($"[EXCEPTION] => {customError}", panelGuid);
+                    results.ForEach((error) => m_service.LogMessage($"[ERROR] => {error.ErrorMessage}", panelGuid));
+                    m_service.LogMessage($"[ERROR] => {customError}", panelGuid);
                     return;
                 }
 
@@ -63,7 +63,7 @@ namespace CRMDevLabs.Toolkit.Presentation.ViewModels
             }
             catch (Exception ex)
             {
-                m_service.LogMessage($"[EXCEPTION] => {ex.Message}", panelGuid);
+                m_service.LogMessage($"[ERROR] => {ex.Message}", panelGuid);
                 m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
         }

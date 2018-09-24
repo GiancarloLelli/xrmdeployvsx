@@ -143,7 +143,7 @@ namespace CRMDevLabs.Toolkit.Commands
             }
             catch (Exception ex)
             {
-                m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
+                m_service.LogMessage($"[ERROR] => {ex.Message}", m_pane);
                 m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
         }
@@ -158,7 +158,7 @@ namespace CRMDevLabs.Toolkit.Commands
             }
             catch (Exception ex)
             {
-                m_service.LogMessage($"[EXCEPTION] => {ex.Message}", m_pane);
+                m_service.LogMessage($"[ERROR] => {ex.Message}", m_pane);
                 m_telemetry.TrackExceptionWithCustomMetrics(ex);
             }
         }
