@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Feature.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Features", "01 - Features", "{C5D2E3C3-1F52-4461-946B-CDBFEF1EC29C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.AzOps", "src\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.AzOps.csproj", "{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMDevLabs.Toolkit.Git", "src\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.Git.csproj", "{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Package", "00 - Package", "{F4B520AB-DED9-4272-8AD9-4ABB21B01D36}"
 EndProject

@@ -71,9 +71,9 @@
     <None Include="SNKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.AzOps.csproj">
+    <ProjectReference Include="..\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.Git.csproj">
       <Project>{6caaedb3-f030-49fe-b58a-66a7b4025b47}</Project>
-      <Name>CRMDevLabs.Toolkit.AzOps</Name>
+      <Name>CRMDevLabs.Toolkit.Git</Name>
     </ProjectReference>
     <ProjectReference Include="..\CRMDevLabs.Toolkit.Models\CRMDevLabs.Toolkit.Models.csproj">
       <Project>{25b98dec-5625-454b-8b79-5279a2fd7271}</Project>

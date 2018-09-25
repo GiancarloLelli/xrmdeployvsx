@@ -8,8 +8,8 @@
     <ProjectGuid>{6CAAEDB3-F030-49FE-B58A-66A7B4025B47}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CRMDevLabs.Toolkit.AzOps</RootNamespace>
-    <AssemblyName>CRMDevLabs.Toolkit.AzOps</AssemblyName>
+    <RootNamespace>CRMDevLabs.Toolkit.Git</RootNamespace>
+    <AssemblyName>CRMDevLabs.Toolkit.Git</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>

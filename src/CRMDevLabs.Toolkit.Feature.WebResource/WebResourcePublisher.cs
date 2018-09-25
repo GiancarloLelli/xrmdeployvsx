@@ -1,5 +1,5 @@
-﻿using CRMDevLabs.Toolkit.AzOps;
-using CRMDevLabs.Toolkit.AzOps.Models;
+﻿using CRMDevLabs.Toolkit.Git;
+using CRMDevLabs.Toolkit.Git.Models;
 using CRMDevLabs.Toolkit.Models.Telemetry;
 using CRMDevLabs.Toolkit.Models.Xrm;
 using CRMDevLabs.Toolkit.Telemetry;
@@ -19,7 +19,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
             {
                 Action<string> reportAction = (m) => { ReportProgress?.Invoke(this, m); };
                 var context = new XrmService(deployConfiguration.DynamicsSettings, deployConfiguration.Solution, telemetry, reportAction);
-                var sourceControl = new VersioningService(projectPath, basePath, reportAction, telemetry);
+                var sourceControl = new VersioningService(projectPath, basePath, deployConfiguration.Branch, reportAction, telemetry);
                 var sourceControlResult = sourceControl.QueryLocalRepository();
 
                 // Must resolve conflicts or something went wrong with TFS interaction
@@ -33,7 +33,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
                     changeList = filteredChangeList;
                 }
 
-                PublishImpl(context, deployConfiguration, telemetry, changeList, project);
+                PublishImpl(context, sourceControl, deployConfiguration, telemetry, changeList, project);
             }
             catch (Exception exception)
             {
@@ -43,7 +43,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
             }
         }
 
-        private void PublishImpl(XrmService context, DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, RawChanges[] changes, string project)
+        private void PublishImpl(XrmService context, VersioningService gitvc, DeployConfigurationModel deployConfiguration, TelemetryWrapper telemetry, RawChanges[] changes, string project)
         {
             try
             {
@@ -60,6 +60,12 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
                     ReportProgress?.Invoke(this, $"[DYNAMICS] => Publishing changes to the CRM.");
                     var faultedFlushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
                     ReportProgress?.Invoke(this, $"[DYNAMICS] => Publish completed.");
+
+                    if (!faultedFlushResult && deployConfiguration.CheckInEnabled)
+                    {
+                        ReportProgress?.Invoke(this, $"[AZOPS] => Commit & Push in progress.");
+                        gitvc.CommitAndPush();
+                    }
                 }
 
                 telemetry.TrackCustomEventWithCustomMetrics("Deploy Finished", new MetricData("Project Name", project));

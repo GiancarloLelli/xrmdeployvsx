@@ -37,35 +37,24 @@ namespace CRMDevLabs.Toolkit.Presentation.Models
             }
         }
 
-        [Required, DataType(DataType.Url)]
-        public string TfsProjectCollectionUri
-        {
-            get { return m_model.SourceControlSettings.TFSCollectionUrl; }
-            set
-            {
-                m_model.SourceControlSettings.TFSCollectionUrl = value;
-                RaisePropertyChanged(() => TfsProjectCollectionUri);
-            }
-        }
-
-        public string Workspace
-        {
-            get { return m_model.Workspace; }
-            set
-            {
-                m_model.Workspace = value;
-                RaisePropertyChanged(() => Workspace);
-            }
-        }
-
         [Required]
-        public string Pat
+        public string Branch
         {
-            get { return m_model.SourceControlSettings.Pat; }
+            get { return m_model.Branch; }
             set
             {
-                m_model.SourceControlSettings.Pat = value;
-                RaisePropertyChanged(() => Pat);
+                m_model.Branch = value;
+                RaisePropertyChanged(() => Branch);
+            }
+        }
+
+        public bool CheckInEnabled
+        {
+            get { return m_model.CheckInEnabled; }
+            set
+            {
+                m_model.CheckInEnabled = value;
+                RaisePropertyChanged(() => CheckInEnabled);
             }
         }
 

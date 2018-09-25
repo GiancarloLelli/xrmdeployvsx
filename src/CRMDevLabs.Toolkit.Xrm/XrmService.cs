@@ -72,7 +72,7 @@ namespace CRMDevLabs.Toolkit.Xrm
 
             try
             {
-                switch (changeType.ToLower())
+                switch (changeType)
                 {
                     case "NewInWorkdir":
                         requestFactoryResult.General = OrganizationRequestFactory.CreateFactory(webResource);

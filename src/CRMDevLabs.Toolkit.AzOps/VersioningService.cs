@@ -1,4 +1,4 @@
-﻿using CRMDevLabs.Toolkit.AzOps.Models;
+﻿using CRMDevLabs.Toolkit.Git.Models;
 using CRMDevLabs.Toolkit.Telemetry;
 using LibGit2Sharp;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CRMDevLabs.Toolkit.AzOps
+namespace CRMDevLabs.Toolkit.Git
 {
     public class VersioningService
     {
@@ -14,13 +14,15 @@ namespace CRMDevLabs.Toolkit.AzOps
         private readonly TelemetryWrapper m_telemetry;
         private readonly string m_repoPath;
         private readonly string m_basePath;
+        private readonly string m_branch;
 
-        public VersioningService(string solutionPath, string baseProjectPath, Action<string> reportProgress, TelemetryWrapper telemetry)
+        public VersioningService(string solutionPath, string baseProjectPath, string branch, Action<string> reportProgress, TelemetryWrapper telemetry)
         {
             m_progress = reportProgress;
             m_telemetry = telemetry;
             m_repoPath = solutionPath;
             m_basePath = baseProjectPath;
+            m_branch = branch;
         }
 
         public SourceControlResultModel QueryLocalRepository()
@@ -73,6 +75,42 @@ namespace CRMDevLabs.Toolkit.AzOps
             }
 
             return result;
+        }
+
+        public void CommitAndPush()
+        {
+            try
+            {
+                using (var gitRepo = new Repository(m_repoPath))
+                {
+                    var status = gitRepo.RetrieveStatus();
+
+                    // Meaningful pending changes
+                    var editPaths = status.Modified.Select(mods => mods.FilePath).ToList();
+                    var addPath = status.Added.Select(mods => mods.FilePath).ToList();
+                    var deletePath = status.Removed.Select(mods => mods.FilePath).ToList();
+
+                    var allChanges = new List<string>();
+                    allChanges.AddRange(editPaths);
+                    allChanges.AddRange(addPath);
+                    allChanges.AddRange(deletePath);
+
+                    if (allChanges.Count > 0)
+                    {
+                        // Stage, Commit & Push
+                        Commands.Stage(gitRepo, allChanges);
+                        var author = new Signature("Avanade Dynamics 365 Toolkit", "avadyntoolkit@avanade.com", DateTimeOffset.Now);
+                        var committer = new Signature(Environment.UserName, "email@email.com", DateTimeOffset.Now);
+                        gitRepo.Commit($"CI commit by {Environment.UserName}", author, committer);
+                        gitRepo.Network.Push(gitRepo.Branches[m_branch]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_progress?.Invoke($"[ERROR] => {ex.Message}");
+                m_telemetry.TrackExceptionWithCustomMetrics(ex);
+            }
         }
     }
 }

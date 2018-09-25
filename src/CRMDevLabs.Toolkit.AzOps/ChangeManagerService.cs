@@ -1,5 +1,5 @@
-﻿using CRMDevLabs.Toolkit.AzOps.Models;
-using CRMDevLabs.Toolkit.Common.Extensions;
+﻿using CRMDevLabs.Toolkit.Common.Extensions;
+using CRMDevLabs.Toolkit.Git.Models;
 using CRMDevLabs.Toolkit.Models.Telemetry;
 using CRMDevLabs.Toolkit.Xrm;
 using CRMDevLabs.Toolkit.Xrm.Extensions;
@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CRMDevLabs.Toolkit.AzOps
+namespace CRMDevLabs.Toolkit.Git
 {
     public class ChangeManagerService
     {

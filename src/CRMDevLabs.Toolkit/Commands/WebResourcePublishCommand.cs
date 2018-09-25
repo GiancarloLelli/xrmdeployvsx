@@ -16,7 +16,6 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Threading;
 using Async = System.Threading.Tasks;
-using Task = System.Threading.Tasks.Task;
 
 namespace CRMDevLabs.Toolkit.Commands
 {
@@ -39,10 +38,9 @@ namespace CRMDevLabs.Toolkit.Commands
         private WebResourcePublishCommand(AsyncPackage package, OleMenuCommandService commandService, IVsSettingsManager vsSettingsManager)
         {
             m_token = new CancellationToken();
-            m_package = package ?? throw new ArgumentNullException(nameof(package));
             m_pane = new Guid("A8E3D03E-28C9-4900-BD48-CEEDEC35E7E6");
             m_service = new DteService(vsSettingsManager);
-
+            m_package = package ?? throw new ArgumentNullException(nameof(package));
             m_telemetry = new TelemetryWrapper(m_service.Version, VersionHelper.GetVersionFromManifest());
 
             if (commandService != null)
@@ -61,6 +59,10 @@ namespace CRMDevLabs.Toolkit.Commands
                 var initSingleDeploy = new OleMenuCommand(SingleDeployMenuItemCallback, singeDeplotMenuCommandId);
                 initSingleDeploy.BeforeQueryStatus += HandleSingleDeployMenuState;
                 commandService.AddCommand(initSingleDeploy);
+
+                // Fix for enable/disable states
+                HandleInitMenuState(initMenuItem, null);
+                HandleDeployMenuState(deployMenuItem, null);
             }
         }
 
@@ -178,7 +180,7 @@ namespace CRMDevLabs.Toolkit.Commands
 
         private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider { get { return this.m_package; } }
 
-        public static async Task InitializeAsync(AsyncPackage package)
+        public static async Async.Task InitializeAsync(AsyncPackage package)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
             var commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;

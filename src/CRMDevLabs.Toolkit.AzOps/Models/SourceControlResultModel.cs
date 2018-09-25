@@ -1,4 +1,4 @@
-﻿namespace CRMDevLabs.Toolkit.AzOps.Models
+﻿namespace CRMDevLabs.Toolkit.Git.Models
 {
     public class SourceControlResultModel
     {
