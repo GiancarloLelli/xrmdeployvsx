@@ -93,6 +93,10 @@ namespace CRMDevLabs.Toolkit.Xrm
                                 requestFactoryResult.Publish = OrganizationRequestFactory.PublishFactory(resourceId.ToString());
                             }
                         }
+                        else
+                        {
+                            requestFactoryResult.General = OrganizationRequestFactory.CreateFactory(webResource);
+                        }
                         break;
                 }
             }

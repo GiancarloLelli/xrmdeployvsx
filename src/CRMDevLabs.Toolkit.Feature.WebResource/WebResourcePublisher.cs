@@ -48,7 +48,6 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
             try
             {
                 ChangeManagerService container = new ChangeManagerService(changes, deployConfiguration.Prefix, context);
-                ReportProgress?.Invoke(this, $"[AZOPS] => Add: {container.AddedItems} - Edit: {container.EditedItems} - Delete: {container.DeletedItems}");
 
                 if (container.WebResources.Count > 0)
                 {

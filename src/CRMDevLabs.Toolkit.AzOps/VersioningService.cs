@@ -22,6 +22,13 @@ namespace CRMDevLabs.Toolkit.Git
             m_telemetry = telemetry;
             m_repoPath = solutionPath;
             m_basePath = baseProjectPath;
+
+            if (string.IsNullOrEmpty(branch))
+                branch = "master";
+
+            if (!branch.Contains("origin"))
+                branch = $"origin/{branch}";
+
             m_branch = branch;
         }
 
@@ -99,10 +106,8 @@ namespace CRMDevLabs.Toolkit.Git
                     {
                         // Stage, Commit & Push
                         Commands.Stage(gitRepo, allChanges);
-                        var author = new Signature("Avanade Dynamics 365 Toolkit", "avadyntoolkit@avanade.com", DateTimeOffset.Now);
-                        var committer = new Signature(Environment.UserName, "email@email.com", DateTimeOffset.Now);
-                        gitRepo.Commit($"CI commit by {Environment.UserName}", author, committer);
-                        gitRepo.Network.Push(gitRepo.Branches[m_branch]);
+                        var agent = new Signature("Avanade Dynamics 365 Toolkit", "dynamicstoolkitsupport@avanade.com", DateTimeOffset.Now);
+                        gitRepo.Commit($"CI commit by {Environment.UserName}", agent, agent);
                     }
                 }
             }
