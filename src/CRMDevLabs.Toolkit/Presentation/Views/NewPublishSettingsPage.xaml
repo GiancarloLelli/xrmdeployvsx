@@ -7,7 +7,7 @@
             ResizeMode="NoResize" ShowInTaskbar="True" HasMinimizeButton="True"
             Title="Avanade Dynamics 365 Toolkit - Web Resource Publish Settings"
             WindowStartupLocation="CenterScreen"
-            Width="650" Height="340" x:Name="WizardWindow"
+            Width="650" Height="400" x:Name="WizardWindow"
             mc:Ignorable="d">
     <Grid>
         <StackPanel>
@@ -73,6 +73,14 @@
                                 <ColumnDefinition Width="120" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="*PAT:" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Configuration.Password, Mode=TwoWay}"/>
+                        </Grid>
+                        <Grid Height="20" Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Auto Commit &amp; Push:" VerticalAlignment="Center" />
                             <CheckBox Grid.Column="1" VerticalAlignment="Center" 
                                       IsChecked="{Binding Configuration.CheckInEnabled, Mode=TwoWay}" />
@@ -90,6 +98,14 @@
                 <FlowDocument Cursor="Arrow">
                     <Paragraph>(*) Indicates a mandatory field</Paragraph>
                     <Paragraph>(**) Pushes will be done directly to remote branch</Paragraph>
+                    <Paragraph>
+                        <Run Text="(***) You can get a Personal Access Token for Azure DevOps following" />
+                        <Hyperlink Cursor="Hand" Click="ClickForNavigationOnPatHowTo">
+                            <Hyperlink.Inlines>
+                                <Run Foreground="Blue" Text="this link" />
+                            </Hyperlink.Inlines>
+                        </Hyperlink>
+                    </Paragraph>
                 </FlowDocument>
             </RichTextBox>
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,10,0">

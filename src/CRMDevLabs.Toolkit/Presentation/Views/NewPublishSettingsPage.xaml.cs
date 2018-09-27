@@ -21,6 +21,11 @@ namespace CRMDevLabs.Toolkit.Presentation.Views
             DataContext = new NewPublishSettingsPageViewModel(dteService, telemetry);
         }
 
+        private void ClickForNavigationOnPatHowTo(object sender, RoutedEventArgs e)
+        {
+            (DataContext as NewPublishSettingsPageViewModel)?.NavigateToPatGuide.Execute(null);
+        }
+
         private void CancelPublish(object sender, RoutedEventArgs e) => Close();
     }
 }

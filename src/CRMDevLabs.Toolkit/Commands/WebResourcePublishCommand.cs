@@ -30,7 +30,9 @@ namespace CRMDevLabs.Toolkit.Commands
         public const int InitCommandId = 0x1023;
         public const int DeployCommandId = 0x1024;
         public const int SingleDeployCommandId = 0x1025;
+
         private const string SETTINGS_STORE = "CRMToolkit";
+        private const string SETTINGS_KEY = "IsConfigDeleted-3.1";
 
         public static readonly Guid CommandSet = new Guid("df1214b3-0c72-4b2e-b906-c5f469fbe3bc");
 
@@ -118,12 +120,11 @@ namespace CRMDevLabs.Toolkit.Commands
                 var basePath = m_service.GetProjectBasePath();
 
                 // Delete settings after breaking update
-                var settingsKey = "IsConfigDeleted-3.0";
-                if (!m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, settingsKey, false) && !string.IsNullOrEmpty(publishSettigsPath))
+                if (!m_service.ReadOnlySettings.GetBoolean(SETTINGS_STORE, SETTINGS_KEY, false) && !string.IsNullOrEmpty(publishSettigsPath))
                 {
                     File.Delete(publishSettigsPath);
                     publishSettigsPath = string.Empty;
-                    m_service.WritableSettings.SetBoolean(SETTINGS_STORE, settingsKey, true);
+                    m_service.WritableSettings.SetBoolean(SETTINGS_STORE, SETTINGS_KEY, true);
                 }
 
                 if (string.IsNullOrEmpty(publishSettigsPath))

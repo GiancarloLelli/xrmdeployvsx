@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.PlatformUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 
 namespace CRMDevLabs.Toolkit.Presentation.ViewModels
@@ -19,6 +20,8 @@ namespace CRMDevLabs.Toolkit.Presentation.ViewModels
 
         public RelayCommand<DialogWindow> SaveConfigurationCommand { get; set; }
 
+        public RelayCommand NavigateToPatGuide { get; set; }
+
         public DeployConfigurationModelFacade Configuration { get; set; }
 
         public string FilePath { get; set; }
@@ -26,10 +29,13 @@ namespace CRMDevLabs.Toolkit.Presentation.ViewModels
         public NewPublishSettingsPageViewModel(DteService service, TelemetryWrapper telemetry)
         {
             SaveConfigurationCommand = new RelayCommand<DialogWindow>((w) => Save(w));
+            NavigateToPatGuide = new RelayCommand(() => NavigateToUrl());
             Configuration = new DeployConfigurationModelFacade();
             m_service = service;
             m_telemetry = telemetry;
         }
+
+        private void NavigateToUrl() => Process.Start("https://www.visualstudio.com/en-us/docs/setup-admin/team-services/use-personal-access-tokens-to-authenticate");
 
         private void Save(DialogWindow window)
         {

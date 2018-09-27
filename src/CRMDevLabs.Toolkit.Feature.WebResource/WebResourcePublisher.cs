@@ -58,13 +58,14 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
 
                     ReportProgress?.Invoke(this, $"[DYNAMICS] => Publishing changes to the CRM.");
                     var faultedFlushResult = context.Flush(container.BuildRequestList(deployConfiguration.Solution));
-                    ReportProgress?.Invoke(this, $"[DYNAMICS] => Publish completed.");
 
                     if (!faultedFlushResult && deployConfiguration.CheckInEnabled)
                     {
                         ReportProgress?.Invoke(this, $"[AZOPS] => Commit & Push in progress.");
-                        gitvc.CommitAndPush();
+                        gitvc.CommitAndPush(deployConfiguration.Password);
                     }
+
+                    ReportProgress?.Invoke(this, $"[AZOPS] => Publish completed.");
                 }
 
                 telemetry.TrackCustomEventWithCustomMetrics("Deploy Finished", new MetricData("Project Name", project));

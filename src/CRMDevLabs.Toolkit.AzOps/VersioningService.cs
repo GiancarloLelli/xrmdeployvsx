@@ -15,6 +15,7 @@ namespace CRMDevLabs.Toolkit.Git
         private readonly string m_repoPath;
         private readonly string m_basePath;
         private readonly string m_branch;
+        private readonly string m_username;
 
         public VersioningService(string solutionPath, string baseProjectPath, string branch, Action<string> reportProgress, TelemetryWrapper telemetry)
         {
@@ -22,14 +23,8 @@ namespace CRMDevLabs.Toolkit.Git
             m_telemetry = telemetry;
             m_repoPath = solutionPath;
             m_basePath = baseProjectPath;
-
-            if (string.IsNullOrEmpty(branch))
-                branch = "master";
-
-            if (!branch.Contains("origin"))
-                branch = $"origin/{branch}";
-
-            m_branch = branch;
+            m_branch = $@"refs/heads/{branch}";
+            m_username = " ";
         }
 
         public SourceControlResultModel QueryLocalRepository()
@@ -84,7 +79,7 @@ namespace CRMDevLabs.Toolkit.Git
             return result;
         }
 
-        public void CommitAndPush()
+        public void CommitAndPush(string password)
         {
             try
             {
@@ -106,8 +101,14 @@ namespace CRMDevLabs.Toolkit.Git
                     {
                         // Stage, Commit & Push
                         Commands.Stage(gitRepo, allChanges);
-                        var agent = new Signature("Avanade Dynamics 365 Toolkit", "dynamicstoolkitsupport@avanade.com", DateTimeOffset.Now);
+                        var agent = new Signature("Avanade Dynamics 365 Toolkit", "dyntlksupport@avanade.com", DateTimeOffset.Now);
                         gitRepo.Commit($"CI commit by {Environment.UserName}", agent, agent);
+
+                        var remote = gitRepo.Network.Remotes["origin"];
+                        if (remote == null)
+                            throw new Exception("Unable to find 'origin' in remote branches list");
+
+                        gitRepo.Network.Push(remote, m_branch, new PushOptions { CredentialsProvider = (a, b, supported) => new UsernamePasswordCredentials { Username = m_username, Password = password } });
                     }
                 }
             }
