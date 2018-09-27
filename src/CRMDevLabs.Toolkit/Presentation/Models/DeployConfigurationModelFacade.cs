@@ -49,17 +49,6 @@ namespace CRMDevLabs.Toolkit.Presentation.Models
         }
 
         [Required]
-        public string Username
-        {
-            get { return m_model.Username; }
-            set
-            {
-                m_model.Username = value;
-                RaisePropertyChanged(() => Username);
-            }
-        }
-
-        [Required]
         public string Password
         {
             get { return m_model.Password; }

@@ -32,7 +32,7 @@ namespace CRMDevLabs.Toolkit.Commands
         public const int SingleDeployCommandId = 0x1025;
 
         private const string SETTINGS_STORE = "CRMToolkit";
-        private const string SETTINGS_KEY = "IsConfigDeleted-3.1";
+        private const string SETTINGS_KEY = "IsConfigDeleted-3.1.1";
 
         public static readonly Guid CommandSet = new Guid("df1214b3-0c72-4b2e-b906-c5f469fbe3bc");
 

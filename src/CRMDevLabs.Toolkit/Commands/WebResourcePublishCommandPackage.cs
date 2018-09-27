@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -12,6 +13,7 @@ namespace CRMDevLabs.Toolkit.Commands
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(WebResourcePublishCommandPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string)]
     public sealed class WebResourcePublishCommandPackage : AsyncPackage
     {
         public const string PackageGuidString = "efd2a755-9bc7-494f-9f48-bbe33c9b9c61";
