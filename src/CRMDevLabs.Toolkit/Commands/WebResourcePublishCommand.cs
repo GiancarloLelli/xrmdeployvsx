@@ -112,9 +112,6 @@ namespace CRMDevLabs.Toolkit.Commands
             try
             {
                 var singleResourceName = e is SingleResourceEventArgs ? (e as SingleResourceEventArgs).File : null;
-                var projectName = m_service.GetSelectedProjectNameForAnalytics();
-                m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
-
                 var publishSettigsPath = m_service.GetPublishSettingsFilePathIfExist();
                 var solutionPath = m_service.GetSolutionRootPath();
                 var basePath = m_service.GetProjectBasePath();
@@ -143,6 +140,9 @@ namespace CRMDevLabs.Toolkit.Commands
 
                 var task = Async.Task.Factory.StartNew(() =>
                 {
+                    var projectName = m_service.GetSelectedProjectNameForAnalytics();
+                    m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
+
                     orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry, singleResourceName, projectName, solutionPath, basePath);
                     orchestrator.ReportProgress -= LogProgress;
                 }, m_token, Async.TaskCreationOptions.None, Async.TaskScheduler.Current);

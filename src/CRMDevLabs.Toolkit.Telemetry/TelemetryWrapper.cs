@@ -13,9 +13,11 @@ namespace CRMDevLabs.Toolkit.Telemetry
         public readonly TelemetryClient Instance;
         public readonly string VisualStudioVersion;
         public readonly string VsxVersion;
+        public readonly VisualStudioUserInfo UserInfo;
 
         public TelemetryWrapper(string visualStudioVersion, string vsxVersion)
         {
+            UserInfo = RegistryKeyReader.GetUserInfo();
             VisualStudioVersion = visualStudioVersion;
             VsxVersion = vsxVersion;
 
@@ -33,10 +35,7 @@ namespace CRMDevLabs.Toolkit.Telemetry
             if (Debugger.IsAttached)
                 return;
 
-            var metrics = new Dictionary<string, string>();
-            metrics.Add("Username", Environment.UserName);
-            metrics.Add("Machine Name", Environment.MachineName);
-            metrics.Add("OS", Environment.OSVersion.ToString());
+            var metrics = Metrics(client.UserInfo);
 
             if (client != null)
             {
@@ -52,12 +51,15 @@ namespace CRMDevLabs.Toolkit.Telemetry
             if (Debugger.IsAttached)
                 return;
 
+            var metrics = Metrics(client.UserInfo);
             var eventData = new EventTelemetry(eventName);
             eventData.Timestamp = DateTime.UtcNow;
             eventData.Properties.Add(data.Key, data.Value);
-            eventData.Properties.Add("Username", Environment.UserName);
-            eventData.Properties.Add("Machine Name", Environment.MachineName);
-            eventData.Properties.Add("OS", Environment.OSVersion.ToString());
+
+            foreach (var itemMetric in metrics)
+            {
+                eventData.Properties.Add(itemMetric.Key, itemMetric.Value);
+            }
 
             if (client != null)
             {
@@ -66,6 +68,27 @@ namespace CRMDevLabs.Toolkit.Telemetry
             }
 
             client.Instance.TrackEvent(eventData);
+        }
+
+        private static Dictionary<string, string> Metrics(VisualStudioUserInfo info)
+        {
+            var metrics = new Dictionary<string, string>();
+
+            metrics.Add("Username", Environment.UserName);
+            metrics.Add("Domain Name", Environment.UserDomainName);
+            metrics.Add("Machine Name", Environment.MachineName);
+            metrics.Add("OS", Environment.OSVersion.ToString());
+            metrics.Add("Version", Environment.Version.ToString());
+            metrics.Add("x64", Environment.Is64BitProcess.ToString());
+
+            if (info != null)
+            {
+                metrics.Add("VS User", info.Name);
+                metrics.Add("VS User Email", info.Email);
+                metrics.Add("VS Profile Link", info.Url);
+            }
+
+            return metrics;
         }
     }
 }
