@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="ITDC-AVACRMTLK" Version="3.1.1" Language="en-US" Publisher="Giancarlo Lelli" />
+        <Identity Id="ITDC-AVACRMTLK" Version="3.1.2" Language="en-US" Publisher="Giancarlo Lelli" />
         <DisplayName>Avanade Dynamics 365 Toolkit</DisplayName>
         <Description xml:space="preserve">Avanade Dynamics 365 CE Toolkit. Use this product to deploy directly from Visual Studio any frontend customization for Microsoft Dynamics 365 CE.</Description>
         <License>license.txt</License>

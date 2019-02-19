@@ -32,7 +32,7 @@ namespace CRMDevLabs.Toolkit.Commands
         public const int SingleDeployCommandId = 0x1025;
 
         private const string SETTINGS_STORE = "CRMToolkit";
-        private const string SETTINGS_KEY = "IsConfigDeleted-3.1.1";
+        private const string SETTINGS_KEY = "IsConfigDeleted-3.1.2";
 
         public static readonly Guid CommandSet = new Guid("df1214b3-0c72-4b2e-b906-c5f469fbe3bc");
 
@@ -141,8 +141,6 @@ namespace CRMDevLabs.Toolkit.Commands
                 var task = Async.Task.Factory.StartNew(() =>
                 {
                     var projectName = m_service.GetSelectedProjectNameForAnalytics();
-                    m_telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", projectName));
-
                     orchestrator.Publish(deployConfiguration.InnerObject, m_telemetry, singleResourceName, projectName, solutionPath, basePath);
                     orchestrator.ReportProgress -= LogProgress;
                 }, m_token, Async.TaskCreationOptions.None, Async.TaskScheduler.Current);

@@ -252,6 +252,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CRMDevLabs.Toolkit.AzOps\CRMDevLabs.Toolkit.Git.csproj">
+      <Project>{6caaedb3-f030-49fe-b58a-66a7b4025b47}</Project>
+      <Name>CRMDevLabs.Toolkit.Git</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CRMDevLabs.Toolkit.Common\CRMDevLabs.Toolkit.Common.csproj">
       <Project>{04ff1cfa-51f8-4fa2-9f5f-3e8f7df25383}</Project>
       <Name>CRMDevLabs.Toolkit.Common</Name>

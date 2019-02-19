@@ -48,6 +48,7 @@ namespace CRMDevLabs.Toolkit.Feature.WebResource
             try
             {
                 ChangeManagerService container = new ChangeManagerService(changes, deployConfiguration.Prefix, context);
+                telemetry.TrackCustomEventWithCustomMetrics("Deploy Started", new MetricData("Project Name", project));
 
                 if (container.WebResources.Count > 0)
                 {
